@@ -329,7 +329,7 @@ export default function JobType() {
             </div>
             
           <div className="modal-action">
-            
+            {/* สมมุติว่าเราแก้อะไรสักอย่างนึง แล้วก็เซฟ*/}
             <button className="btn bg-green-500 border border-green-500 text-white px-4 py-2 rounded-md" onClick={() => handleStatus()}>
               ตกลง
             </button>
