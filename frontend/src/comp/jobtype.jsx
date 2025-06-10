@@ -75,16 +75,18 @@ export default function JobType() {
 
   const handleStatus = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/jobtype/${editData.jobtype_id}`, {
+      const res = await fetch(`http://localhost:8081/jobtypesta/${editData.jobtype_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: editData.status }),
+        //body: JSON.stringify({ status: editData.status }),
       });
 
       if (res.ok) {
         alert("อัปเดตสำเร็จ!");
+        document.getElementById("status_modal").close();
+        fetchData();
         
       } else {
         console.error("Update failed");
@@ -190,7 +192,7 @@ export default function JobType() {
           </thead>
           <tbody>
             {data.map((val, index) => (
-              <tr key={index} className="hover:bg-[#D9D9D9] text-[10px] md:text-lg">
+              <tr key={index} className="hover:bg-[#D9D9D9] text-[10px] md:text-[15px]">
                 <td className="text-center">{(page-1) * limit + index +1}</td>
                 <td className="">{val.jobtype_name || "N/A"}</td>
 
@@ -202,16 +204,16 @@ export default function JobType() {
                     )}
                 
 
-                <td className="text-center">
-                  <button className="btn btn-xs md:btn-sm btn-warning text-[10px] text-white" onClick={() => handleEdit(val)}>แก้ไข</button>&nbsp;
+                <td className=" flex flex-col items-center md:block md:text-center">
+                  <button className="btn btn-xs w-11 md:btn-sm btn-warning text-[10px] text-white mb-1 md:mr-1 md:mb-0" onClick={() => handleEdit(val)}>แก้ไข</button>
                     {val.status === "ON" ? (
-                        <button className="btn btn-xs md:btn-sm btn-error text-[10px] text-white" onClick={() => handleSta(val)}>ระงับ</button>
+                        <button className="btn btn-xs w-11 md:btn-sm btn-error text-[10px] text-white mb-1 md:mr-1 md:mb-0" onClick={() => handleSta(val)}>ระงับ</button>
                     ) : (
-                        <button className="btn btn-xs md:btn-sm btn-success text-[10px] text-white" onClick={() => handleSta(val)}>อนุมัติ</button>
+                        <button className="btn btn-xs w-11 md:btn-sm btn-success text-[10px] text-white mb-1 md:mr-1 md:mb-0" onClick={() => handleSta(val)}>อนุมัติ</button>
                     )
                     }
 
-                    &nbsp;<button className="btn btn-xs md:btn-sm btn-error text-[10px] text-white" onClick={() => handleDel(val)} >ลบ</button>
+                    <button className="btn btn-xs w-11 md:btn-sm btn-error text-[10px] text-white" onClick={() => handleDel(val)} >ลบ</button>
                 </td>
               </tr>
             ))}
@@ -220,39 +222,39 @@ export default function JobType() {
         
       </div>
       <center>
-        <div className="join items-center gap-2 mt-4 mb-4">
+        <div className="join items-center gap-2 my-2">
           {page > 1 && (
-            <button onClick={() => setPage(page - 1)}><img src="/up.png" className="w-6 h-6 hover:shadow-lg transition-shadow" /></button>
+            <button onClick={() => setPage(page - 1)}><img src="/up.png" className="w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
           )}
 
         {total > 0 ? (
-          <button className="btn btn-primary rounded-3xl join-item btn">{page}</button>
+          <button className="btn btn-xs btn-primary rounded-3xl join-item btn">{page}</button>
         ) : (
-          <button className="btn btn-primary rounded-3xl join-item btn">ไม่มีข้อมูล</button>
+          <button className="btn btn-xs btn-primary rounded-3xl join-item btn">ไม่มีข้อมูล</button>
         )
         }
 
           {page < totalPages && (
-            <button onClick={() => setPage(page + 1)}><img src="/down.png" className="w-6 h-6 hover:shadow-lg transition-shadow" /></button>
+            <button onClick={() => setPage(page + 1)}><img src="/down.png" className="w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
           )}
         </div>
       </center>
       {/* Modal สำหรับแก้ไข */}
       <dialog id="my_modal" className="modal">
-        <div className="modal-box  bg-white">
-          <center><h2 className="text-lg text-[#7B6ADA] font-bold mb-4">แก้ไขประเภทงาน</h2></center>
+        <div className="modal-box bg-white">
+          <center><h2 className="text-xs md:text-lg text-[#7B6ADA] font-bold mb-4">แก้ไขประเภทงาน</h2></center>
           <input
             type="text"
-            className="w-full text-[#7B6ADA] border border-gray-300 rounded-md px-3 py-2 mt-2"
+            className="w-full text-sm md:text-md text-[#7B6ADA] border border-gray-300 rounded-md px-3 py-2 mt-2"
             value={editData.jobtype_name}
             onChange={(e) => setEditData({ ...editData, jobtype_name: e.target.value })}
           />
           <div className="modal-action">
             
-            <button className="btn bg-green-500 text-white px-4 py-2 rounded-md" onClick={handleUpdate}>
+            <button className="btn btn-sm md:btn-md bg-green-500 border border-green-500 text-white px-4 py-2 rounded-md" onClick={handleUpdate}>
               บันทึก
             </button>
-            <button className="btn bg-red-500 text-white px-4 py-2 rounded-md" onClick={() => document.getElementById("my_modal").close()}>
+            <button className="btn btn-sm md:btn-md bg-red-500 border border-red-500 text-white px-4 py-2 rounded-md" onClick={() => document.getElementById("my_modal").close()}>
               ยกเลิก
             </button>
           </div>
@@ -261,20 +263,20 @@ export default function JobType() {
 
       {/* Modal สำหรับเพิ่ม */}
       <dialog id="add_modal" className="modal">
-        <div className="modal-box  bg-white">
-          <center><h2 className="text-lg text-[#7B6ADA] font-bold mb-4">เพิ่มประเภทงาน</h2></center>
+        <div className="modal-box bg-white">
+          <center><h2 className="text-xs md:text-lg text-[#7B6ADA] font-bold mb-2 md:mb-4">เพิ่มประเภทงาน</h2></center>
           <input
             type="text"
-            className="w-full text-[#7B6ADA] border border-gray-300 rounded-md px-3 py-2 mt-2"
+            className="w-full text-sm md:text-md text-[#7B6ADA] border border-gray-300 rounded-md px-3 py-2 mt-2"
             value={addData.jobtype_name}
             onChange={(e) => setAddData({ ...addData, jobtype_name: e.target.value })}
           />
           <div className="modal-action">
             
-            <button className="btn bg-green-500 text-white px-4 py-2 rounded-md" onClick={handleInsert}>
+            <button className="btn btn-sm md:btn-md bg-green-500 border border-green-500 text-white px-4 py-2 rounded-md" onClick={handleInsert}>
               บันทึก
             </button>
-            <button className="btn bg-red-500 text-white px-4 py-2 rounded-md" onClick={() => document.getElementById("add_modal").close()}>
+            <button className="btn btn-sm md:btn-md bg-red-500 border border-red-500 text-white px-4 py-2 rounded-md" onClick={() => document.getElementById("add_modal").close()}>
               ยกเลิก
             </button>
           </div>
@@ -284,16 +286,18 @@ export default function JobType() {
       {/* Modal สำหรับลบบบบบบบบบบ */}
       <dialog id="del_modal" className="modal">
         <div className="modal-box  bg-white">
-          <center><h2 className="text-lg text-[#7B6ADA] font-bold mb-4">คุณต้องการลบข้อมูลประเภทงานนี้</h2></center>
+          <center><h2 className="text-xs md:text-lg text-[#7B6ADA] font-bold mb-4">คุณต้องการลบข้อมูลประเภทงานนี้</h2></center>
             <div className="flex">
-              <label className="text-[#7B6ADA]">ชื่อประเภทงาน : </label>&nbsp;&nbsp;<h3 className="text-[#7B6ADA] font-bold">{delData.jobtype_name}</h3>
+              <label className="text-xs md:text-md text-[#7B6ADA]">ชื่อประเภทงาน : </label>
+              &nbsp;&nbsp;
+              <h3 className="text-xs text-[#7B6ADA] font-bold">{delData.jobtype_name}</h3>
             </div>
           <div className="modal-action">
             
-            <button className="btn bg-red-500 text-white px-4 py-2 rounded-md" onClick={() => handleDelete()}>
+            <button className="btn btn-sm md:btn-md bg-red-500 border border-red-500 text-white px-4 py-2 rounded-md" onClick={() => handleDelete()}>
               ลบเลยยย
             </button>
-            <button className="btn bg-green-500 text-white px-4 py-2 rounded-md" onClick={() => document.getElementById("del_modal").close()}>
+            <button className="btn btn-sm md:btn-md bg-green-500 border border-green-500 text-white px-4 py-2 rounded-md" onClick={() => document.getElementById("del_modal").close()}>
               ดูก่อนละกัน
             </button>
           </div>
@@ -304,8 +308,7 @@ export default function JobType() {
       <dialog id="status_modal" className="modal">
         <div className="modal-box bg-white">
           <center>
-              
-                {editData.status === "ON" ? (
+              {editData.status === "ON" ? (
                       <a className="text-xs md:text-lg text-error font-bold mb-4">ต้องการระงับประเภทงานนี้ใช่หรือไม่?</a> 
                   ) : (
                      <a className="text-xs md:text-lg text-success font-bold mb-4">ต้องการอนุมัติประเภทงานนี้ใช่หรือไม่?</a>  
@@ -314,17 +317,17 @@ export default function JobType() {
           </center>   
           
             <div className="flex items-center">
-              <label className="text-xs text-[#7B6ADA]">ชื่อประเภทงาน : </label>
+              <label className="text-xs md:text-md text-[#7B6ADA]">ชื่อประเภทงาน : </label>
               &nbsp;&nbsp;
-              <h3 className="text-sm text-[#7B6ADA] font-bold">{editData.jobtype_name}</h3>
+              <h3 className="text-xs text-[#7B6ADA] font-bold">{delData.jobtype_name}</h3>
             </div>
             <div className="flex items-center">
               <label className="text-xs text-[#7B6ADA]">สถานะ : </label>
               &nbsp;&nbsp;
                 {editData.status === "ON" ? (
-                    <td className="text-sm text-center font-bold">ปกติ</td>
+                    <a className="text-sm text-center text-success font-bold">ปกติ</a>
                 ) : (
-                    <td className="text-sm text-center text-error font-bold">ถูกระงับ</td>
+                    <a className="text-sm text-center text-error font-bold">ถูกระงับ</a>
                 )}
             </div>
             

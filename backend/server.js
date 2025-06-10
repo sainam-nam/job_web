@@ -186,6 +186,15 @@ app.put("/jobtype/:id", (req, res) => {
     });
   });
 
+  app.put("/jobtypesta/:id", (req, res) => {
+    const { id } = req.params;
+    const sql = "UPDATE jobtype SET status = IF(status = 'ON' , 'OFF' , 'ON') WHERE jobtype_id = ?";
+    db.query(sql, [id], (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: "อัปเดตสำเร็จ!" });
+    });
+  });
+
 app.post("/jobtype/", (req, res) => {
     const { jobtype_name } = req.body;
     // เช็คว่ามีค่าหรือไม่
