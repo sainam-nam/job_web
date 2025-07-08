@@ -7,16 +7,25 @@ export default function Navbar(){
         
         <div className="drawer-content">
           <div className="navbar bg-[#7B6ADA] border-[#7B6ADA]" >
-            <div className="flex-1">
+            <div className="flex-none">
               <div className="flex items-center">
-                <label htmlFor="my-drawer" className="btn btn-xs btn-ghost hover:bg-[#7B6ADA] hover:border-[#7B6ADA] md:hidden ">
+                <label htmlFor="my-drawer" className="btn btn-xs btn-ghost hover:bg-[#7B6ADA] hover:border-[#7B6ADA] lg:hidden ">
                   <img className="w-3 h-3 md:w-5 md:h-5" src="/menu.png"></img>
                 </label>
                 <a className="text-sm md:text-xl font-bold md:ml-3">JOB & VOLUN</a>
               </div>
             </div>
-            
-            <div className="flex-none">
+            <div className="flex-1">
+          
+              <ul className="hidden md:menu md:menu-horizontal md:px-1 md:text-xs">
+                    <li><a className="font-bold">หน้าหลัก</a></li>
+                    <li><a>งาน</a></li>
+                    <li><a>กิจกรรมจิตอาสา</a></li>
+                    <li><a>การจับคู๋</a></li>
+                  </ul>
+                  
+            </div>
+            <div className="flex gap-2">
               <ul className="menu menu-horizontal px-1 text-xs">
                 <li><a>Link</a></li>
                 <li>

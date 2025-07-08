@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useNavigate } from "react-router-dom";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa";
+import { FaCircleCheck } from "react-icons/fa6";
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -11,27 +12,41 @@ function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
    
-    function handleSubmit(event) {
+     async function handleSubmit(event) {
       event.preventDefault();
-      axios.post('http://localhost:8081/login', {email, password})
-      .then(res => {
+      try {
+        //console.log(email, password);
+        const res = await axios.post('http://localhost:8081/login', { email, password });
+
         if (res.data.message === "Login successful") {
-          const role = res.data.status;
+          
+          const user = res.data.user;
+          const role = user.status; // สมมุติ backend ส่ง role มาด้วย
+
+          //เก็บ token และ user ลง localStorage
+          localStorage.setItem("token", res.data.token);
+          localStorage.setItem("user", JSON.stringify(user));
+
+          // 👉 redirect ตาม role หรือสถานะ
           if (role === "admin") {
             navigate("/Admin");
-            window.scrollTo(0,0);
-          }else if (role === "ON"){
-            navigate("/User");
-            window.scrollTo(0,0);
-          }else if (role === "OFF") {
+            window.scroll(0,0);
+          } else if (role === "jobber" || role === "ON") {
+            navigate("/User/alljob");
+            window.scroll(0,0);
+          } else if (role === "OFF") {
+            
             alert("บัญชีของคุณถูกระงับ");
           }
         } else {
           alert("อีเมลล์หรือรหัสผ่านของคุณไม่ถูกต้อง");
         }
-      })
-      .catch(err => console.log(err));
+      } catch (err) {
+        console.error(err);
+        alert("เกิดข้อผิดพลาดในการเข้าสู่ระบบ อีเมลล์หรือรหัสผ่านของคุณไม่ถูกต้อง");
+      }
     }
+    
     return (
       <div>
         <Navbar_login />

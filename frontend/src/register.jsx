@@ -87,7 +87,7 @@ function Register() {
                     <a className="text-[#7B6ADA] font-bold">อีเมลล์</a>
                     <input 
                       type="text" 
-                      className="input w-90 lg:w-120 bg-white text-[#7B6ADA] border-[#A3A3A3] rounded-box" 
+                      className="input w-90 lg:w-120 bg-white text-[#7B6ADA] border border-[#A3A3A3] rounded-box" 
                       name="email"
                       value={form.email}
                       onChange={handleChange} required/>

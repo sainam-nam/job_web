@@ -17,7 +17,7 @@ function Admin() {
          
          <div className="flex min-h-screen bg-white">
          
-            <div className="hidden md:block"><Menu /></div>
+            <div className="hidden lg:block"><Menu /></div>
 
             
             <div className="flex-1 ">

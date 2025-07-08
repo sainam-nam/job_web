@@ -1,1 +1,4 @@
 @import "tailwindcss";
+body {
+  font-family: 'Noto Sans Thai', sans-serif;
+}

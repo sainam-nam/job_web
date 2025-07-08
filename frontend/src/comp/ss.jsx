@@ -56,7 +56,7 @@ export default function SS() {
       });
 
       if (res.ok) {
-        alert("อัปเดตสำเร็จ!");
+        //alert("อัปเดตสำเร็จ!");
         document.getElementById("my_modal").close();
         fetchData();
       } else {
@@ -82,7 +82,7 @@ export default function SS() {
       });
 
       if (res.ok) {
-        alert("เพิ่มข้อมูลสำเร็จ!");
+        //alert("เพิ่มข้อมูลสำเร็จ!");
         document.getElementById("add_modal").close();
         fetchData();
       } else {
@@ -101,7 +101,7 @@ export default function SS() {
       });
 
       if (res.ok) {
-        alert("ลบข้อมูลสำเร็จ!");
+        //alert("ลบข้อมูลสำเร็จ!");
         document.getElementById("del_modal").close();
         fetchData();
       } else {
@@ -147,9 +147,9 @@ export default function SS() {
         <table className="table">
           <thead>
             <tr className="bg-[#D9D9D9] text-[10px] md:text-lg text-[#7B6ADA] font-bold text-center">
-              <th className="w-1/8">#</th>
-              <th className="w-2/4">ทักษะส่วนบุคคล</th>
-              <th className="w-2/4">จัดการ</th>
+              <th className="w-[5%]">ที่</th>
+              <th className="w-[70%]">ทักษะด้านอารมณ์</th>
+              <th className="w-[25%]">จัดการ</th>
             </tr>
           </thead>
           <tbody>
@@ -157,9 +157,20 @@ export default function SS() {
               <tr key={index} className="hover:bg-[#D9D9D9] text-[10px] md:text-lg">
                 <td className="text-center">{(page-1) * limit + index +1}</td>
                 <td className="">{val.softskill_name || "N/A"}</td>
+                
                 <td className="text-center">
-                  <button className="btn btn-xs text-[10px] md:text-lg btn-warning text-white" onClick={() => handleEdit(val)}>แก้ไข</button>&nbsp;
-                  <button className="btn btn-xs text-[10px] md:text-lg btn-error text-white" onClick={() => handleDel(val)} >ลบ</button>
+                  <button className="btn btn-xs text-md md:text-lg btn-warning text-2xl text-white w-8 h-7 md:w-9 md:w-9 lg:w-10 lg:w-10" onClick={() => handleEdit(val)}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-8">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                    </svg>
+
+                    </button>&nbsp;
+                  <button className="btn btn-xs text-md md:text-lg btn-error text-white w-8 h-7 md:w-9 md:w-9 lg:w-10 lg:w-10" onClick={() => handleDel(val)} >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-8">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+
+                  </button>
                 </td>
               </tr>
             ))}
@@ -173,7 +184,7 @@ export default function SS() {
             <button disabled={page === 1} onClick={() => setPage(page - 1)}><img src="/up.png" className="w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
         )}
         {total > 0 ? (
-          <button className="btn btn-xs btn-primary rounded-3xl join-item btn">{page}</button>
+          <button className="btn btn-xs btn-primary rounded-3xl join-item btn">{page}/{totalPages}</button>
         ) : (
           <button className="btn btn-xs btn-primary rounded-3xl join-item btn">ไม่มีข้อมูล</button>
         )
@@ -187,7 +198,7 @@ export default function SS() {
       {/* Modal สำหรับแก้ไข */}
       <dialog id="my_modal" className="modal">
         <div className="modal-box bg-white">
-          <center><h2 className="text-xs md:text-lg text-[#7B6ADA] font-bold mb-4">แก้ไขทักษะและความสามารถพิเศษ</h2></center>
+          <center><h2 className="text-xs md:text-lg text-[#7B6ADA] font-bold mb-4">แก้ไขทักษะด้านอารมณ์</h2></center>
           <input
             type="text"
             className="w-full text-sm md:text-md text-[#7B6ADA] border border-gray-300 rounded-md px-3 py-2 mt-2"
@@ -209,7 +220,7 @@ export default function SS() {
       {/* Modal สำหรับเพิ่ม */}
       <dialog id="add_modal" className="modal">
         <div className="modal-box  bg-white">
-          <center><h2 className="text-xs md:text-lg text-[#7B6ADA] font-bold mb-2 md:mb-4">เพิ่มทักษะและความสามารถพิเศษ</h2></center>
+          <center><h2 className="text-xs md:text-lg text-[#7B6ADA] font-bold mb-2 md:mb-4">เพิ่มทักษะด้านอารมณ์</h2></center>
           <input
             type="text"
             className="w-full text-sm md:text-md text-[#7B6ADA] border border-gray-300 rounded-md px-3 py-2 mt-2"
@@ -231,9 +242,9 @@ export default function SS() {
       {/* Modal สำหรับลบบบบบบบบบบ */}
       <dialog id="del_modal" className="modal">
         <div className="modal-box  bg-white">
-          <center><h2 className="text-xs md:text-lg text-[#7B6ADA] font-bold mb-4">คุณต้องการลบข้อมูลทักษะและความสามารถพิเศษนี้</h2></center>
+          <center><h2 className="text-xs md:text-lg text-[#7B6ADA] font-bold mb-4">คุณต้องการลบข้อมูลทักษะด้านอารมณ์นี้</h2></center>
             <div className="flex flex-col">
-              <label className="text-xs md:text-md text-[#7B6ADA]">ชื่อข้อมูลทักษะและความสามารถพิเศษ : </label>
+              <label className="text-xs md:text-md text-[#7B6ADA]">ชื่อข้อมูลทักษะด้านอารมณ์ : </label>
               <h3 className="text-xs text-[#7B6ADA] font-bold">{delData.softskill_name}</h3>
             </div>
           <div className="modal-action">
