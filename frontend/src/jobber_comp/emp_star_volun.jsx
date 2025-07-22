@@ -3,12 +3,12 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 
 const EmpRating_volun = ({ emp_id , cl }) => {
   const [stars, setStars] = useState(0);
-  
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     //console.log('emp_id:', cl);
     //if (!emp_id) return;
-    fetch(`http://localhost:8081/volun_rating?emp_id=${emp_id}`)
+    fetch(`${apiUrl}/volun_rating?emp_id=${emp_id}`)
       .then(res => res.json())
       .then(data => setStars(data.stars || 0));
   }, [emp_id , cl]);

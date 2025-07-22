@@ -12,6 +12,7 @@ function ResetPassword() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
   const [success, setSuccess] = useState(false);
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +23,7 @@ function ResetPassword() {
     }
 
     try {
-      const res = await axios.post('http://localhost:8081/reset-password', {
+      const res = await axios.post(`${apiUrl}/reset-password`, {
         email,
         token,
         password,

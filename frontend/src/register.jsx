@@ -1,10 +1,10 @@
-import React, { useState } from "react"
+import React, { useState , useEffect } from "react"
 import Navbar_regis from "./comp/nav_reg"
 import axios from 'axios'
 import { useNavigate } from "react-router-dom";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa";
-
+import TermsModal from "./jobber_comp/TermsModel";
 
 function Register() {
     const [form, setForm] = useState({
@@ -15,10 +15,20 @@ function Register() {
       confirmPassword: "",
     });
     
-    
+    const [showModal, setShowModal] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showCPassword, setShowCPassword] = useState(false);
+
+    const [emailExists, setEmailExists] = useState(false);
+    const [isVerified, setIsVerified] = useState(false);
+    const [fullnameExists, setFullnameExists] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const [passwordStrength, setPasswordStrength] = useState('');
+    const [passwordMatch, setPasswordMatch] = useState(true);
+
     const navigate = useNavigate();
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
    
     const handleChange = (e) => {
       setForm({ ...form, [e.target.name]: e.target.value});
@@ -27,17 +37,24 @@ function Register() {
     const handleSubmit = async (e) => {
       e.preventDefault();
       //console.log("form::", form);
+      if (loading) return;
+
+      // เริ่มโหลด
+      setLoading(true);
+
       if (form.password !== form.confirmPassword) {
         alert("รหัสผ่านไม่ตรงกัน");
+        setLoading(false);
         return;
       }
 
       try {
-        const res = await axios.post('http://localhost:8081/register', form);
+        const res = await axios.post(`${apiUrl}/register`, form);
         if (res.data.status === "ok") {
-          alert("สมัครสมาชิกสำเร็จ");
-          navigate("/login");
-        } else {
+          document.getElementById("registergood_modal").showModal();
+        } else if (res.data.status === "pending") {
+          alert(message); // เคยสมัครแต่ยังไม่ยืนยัน
+        }  else {
           alert(res.data.message || "เกิดข้อผิดพลาดในการสมัคร");
         }
       } catch (error) {
@@ -45,7 +62,57 @@ function Register() {
         console.error("register error:", error);
         alert("ไม่สามารถสมัครสมาชิกได้")
       }
-    }
+      setLoading(false);
+    };
+
+    useEffect(() => {
+      if (!form.email.trim()) {
+        setEmailExists(false);
+        setIsVerified(false);
+        return;
+      }
+      const checkEmail = async () => {
+        try {
+          const res = await axios.get(`${apiUrl}/check-email?email=${form.email}`);
+          setEmailExists(res.data.exists);
+          setIsVerified(res.data.is_verified);
+        } catch (err) {
+          console.error("Error checking email:", err);
+        }
+      };
+      checkEmail();
+    }, [form.email]);
+
+    useEffect(() => {
+      const checkFullname = async () => {
+        const fullname = `${form.firstname.trim()} ${form.lastname.trim()}`;
+        if (form.firstname && form.lastname) {
+          const res = await axios.get(`${apiUrl}/check-fullname?fullname=${fullname}`);
+          setFullnameExists(res.data.exists);
+        }
+      };
+      checkFullname();
+    }, [form.firstname, form.lastname]);
+
+    useEffect(() => {
+      const checkPasswordStrength = () => {
+        const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        if (!form.password) {
+          setPasswordStrength('');
+        } else if (strongRegex.test(form.password)) {
+          setPasswordStrength('strong');
+        } else {
+          setPasswordStrength('weak');
+        }
+      };
+      checkPasswordStrength();
+    }, [form.password]);
+
+    useEffect(() => {
+      setPasswordMatch(form.password === form.confirmPassword);
+    }, [form.password, form.confirmPassword]);
+
+
     return (
       <div>
         <Navbar_regis />
@@ -84,13 +151,28 @@ function Register() {
                                 onChange={handleChange} required/>
                         </div>
                     </div>
-                    <a className="text-[#7B6ADA] font-bold">อีเมลล์</a>
+                    {fullnameExists && (
+                      <p className="text-red-500 text-xs mt-1">ชื่อ-นามสกุลนี้มีผู้ใช้งานแล้ว</p>
+                    )}
+
+                    <a className="text-[#7B6ADA] font-bold">อีเมล</a>
                     <input 
                       type="text" 
                       className="input w-90 lg:w-120 bg-white text-[#7B6ADA] border border-[#A3A3A3] rounded-box" 
                       name="email"
                       value={form.email}
                       onChange={handleChange} required/>
+                    
+                    {emailExists && isVerified && (
+                        <p className="text-red-500 text-xs mt-1">อีเมลนี้มีผู้ใช้งานแล้ว</p>
+                      )}
+
+                      {emailExists && !isVerified && (
+                        <p className="text-yellow-600 text-xs mt-1">
+                          คุณเคยสมัครไว้ แต่ยังไม่ยืนยันอีเมล กรุณาตรวจสอบกล่องอีเมล
+                        </p>
+                      )}
+
 
                     <div className="flex justify-between">
                       <a className="text-[#7B6ADA] font-bold">รหัสผ่าน</a>
@@ -109,6 +191,15 @@ function Register() {
                       onChange={handleChange} 
                       required
                     />
+                    {passwordStrength === 'weak' && (
+                      <p className="text-red-500 text-xs mt-1">
+                        รหัสผ่านควรมีอย่างน้อย 8 ตัวอักษร รวมทั้งตัวใหญ่ ตัวเล็ก ตัวเลข และสัญลักษณ์
+                      </p>
+                    )}
+                    {passwordStrength === 'strong' && (
+                      <p className="text-green-500 text-xs mt-1">รหัสผ่านปลอดภัย</p>
+                    )}
+
                     <div className="flex justify-between">
                       <a className="text-[#7B6ADA] font-bold">ยืนยันรหัสผ่าน</a>
                       <div 
@@ -126,6 +217,9 @@ function Register() {
                       onChange={handleChange}
                       required
                     />
+                    {form.confirmPassword && !passwordMatch && (
+                        <p className="text-red-500 text-xs mt-1">รหัสผ่านไม่ตรงกัน</p>
+                      )}
 
                     
 
@@ -134,12 +228,20 @@ function Register() {
                     <div>
                         <input type="checkbox" className="checkbox border-[#7B6ADA] checked:text-[#7B6ADA]" required />
                         <a className="text-[#A3A3A3] text-xs lg:text-sm">ยอมรับ</a>
-                        <a className="underline text-[#7B6ADA] text-xs lg:text-sm">เงื่อนไขข้อตกลง</a>
-                        <a className="text-[#A3A3A3] text-xs lg:text-sm">และ</a>
-                        <a className="underline text-[#7B6ADA] text-xs lg:text-sm">นโยบายความเป็นส่วนตัว</a>
+                        <a onClick={() => setShowModal(true)} className="underline text-[#7B6ADA] text-xs lg:text-sm">เงื่อนไขข้อตกลงและนโยบายความเป็นส่วนตัว</a>
                         <a className="text-[#A3A3A3] text-xs lg:text-sm">ของ Job & Volun</a>
                     </div>
-                  <button className="btn bg-[#7B6ADA] border-[#7B6ADA] rounded-xl my-2 hover:border-5">ลงทะเบียน</button>
+                    <TermsModal show={showModal} onClose={() => setShowModal(false)} />
+                  <button 
+                    type="submit"
+                    className="btn bg-[#7B6ADA] border-[#7B6ADA] rounded-xl my-2 hover:border-5"
+                    disabled={
+                      loading ||
+                      (emailExists || fullnameExists || !passwordMatch || passwordStrength !== "strong") && form.password.length > 0
+                    }
+                  >
+                    {loading ? "กำลังลงทะเบียน..." : "ลงทะเบียน"}
+                  </button>
                 </div>
               </form>
               <a className="text-[#A3A3A3] underline hover:text-[#7B6ADA] text-sm" onClick={() => navigate("/login")}>เคยลงทะเบียนแล้ว?</a>
@@ -147,6 +249,47 @@ function Register() {
           </div>
         </div>
         </div>
+        {/* Modal เวลคัม แอดมิน */}
+        <dialog id="registergood_modal" className="modal">
+          <div className="modal-box bg-white">
+            <center>
+                <p className="text-4xl  text-[#7B6ADA]">ลงทะเบียนสำเร็จ</p>
+                <p className="text-3xl  text-[#7B6ADA]">กรุณาตรวจสอบอีเมลของคุณเพื่อยืนยันบัญชี</p>
+              <div className="w-30 h-30 flex items-center justify-center my-6">
+                <img src="/check.png" className="rounded-full"></img>
+              </div>
+            </center>   
+            <div className="modal-action flex justify-center">
+              
+                <button className="btn bg-[#7B6ADA] border border-[#7B6ADA] text-white px-4 py-2 rounded-lg" onClick={() => {navigate("/login"); window.scrollTo(0, 0);}}>
+                  เข้าสู่ระบบ
+                </button>
+              
+            </div>
+          </div>
+        </dialog>
+
+        {/* Modal เคยลงทะเบียนแล้ว แต่ยังไม่ได้ยืนยันอีเมล */}
+        <dialog id="pending_modal" className="modal">
+          <div className="modal-box bg-white">
+            <center>
+                <p className="text-4xl  text-[#7B6ADA]">คุณเคยลงทะเบียนไว้แล้ว แต่ยังไม่ได้ยืนยันอีเมล</p>
+                <p className="text-3xl  text-[#7B6ADA]">กรุณาตรวจสอบอีเมลของคุณอีกครั้ง</p>
+                <p className="text-3xl  text-[#7B6ADA]">{form.email}</p>
+              <div className="w-30 h-30 flex items-center justify-center my-6">
+                <img src="/check.png" className="rounded-full"></img>
+              </div>
+            </center>   
+            <div className="modal-action flex justify-center">
+              
+                <button className="btn bg-[#7B6ADA] border border-[#7B6ADA] text-white px-4 py-2 rounded-lg" onClick={() => {navigate("/login"); window.scrollTo(0, 0);}}>
+                  เข้าสู่ระบบ
+                </button>
+              
+            </div>
+          </div>
+        </dialog>
+        
       </div>
     )
 }

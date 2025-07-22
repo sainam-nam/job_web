@@ -21,7 +21,9 @@ export default function Position() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/position?page=${page}&limit=${limit}&keyword=${search}`);
+      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+      const res = await fetch(`${apiUrl}/position?page=${page}&limit=${limit}&keyword=${search}`);
       const result = await res.json();
 
       if(Array.isArray(result.data)){
@@ -42,7 +44,9 @@ export default function Position() {
 
   const jobtype = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/jobtypeall`);
+      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+      const res = await fetch(`${apiUrl}/jobtypeall`);
       const result = await res.json();
       //console.log("jobtypedata response:", result);
 
@@ -78,7 +82,9 @@ export default function Position() {
 
   const handleUpdate = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/position/${editData.position_id}`, {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+      const res = await fetch(`${apiUrl}/position/${editData.position_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -103,7 +109,9 @@ export default function Position() {
 
   const handleStatus = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/positionsta/${editData.position_id}`, {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+      const res = await fetch(`${apiUrl}/positionsta/${editData.position_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -135,7 +143,9 @@ export default function Position() {
     }
     try {
       //console.log("ส่งข้อมูลไป backend:", addData);
-      const res = await fetch("http://localhost:8081/position/", {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+      const res = await fetch(`${apiUrl}/position/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -161,7 +171,9 @@ export default function Position() {
 
   const handleDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/position/${delData.position_id}`, {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+      const res = await fetch(`${apiUrl}/position/${delData.position_id}`, {
         method: "DELETE",
         
       });
@@ -183,7 +195,9 @@ export default function Position() {
   return (
     <main className="flex-1 pt-2 px-4 lg:p-8">
       
-      
+      <div className="flex items-center justify-center text-[#7B6ADA] text-xl font-bold">
+        <p>ข้อมูลตำแหน่งงาน</p>
+      </div>
       
       <div className="flex justify-between items-center mt-1 mb-3 md:mt-2 md:mb-2">
         <h1 className="text-[#7B6ADA] text-[10px] font-bold md:text-lg">ทั้งหมด {total} รายการ</h1>
@@ -277,7 +291,7 @@ export default function Position() {
       <center>
         <div className="join items-center gap-2 my-2">
           {page > 1 && (
-            <button onClick={() => setPage(page - 1)}><img src="/up.png" className="w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
+            <button onClick={() => setPage(page - 1)}><img src="/up.png" className="-rotate-90 w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
           )}
 
         {total > 0 ? (
@@ -288,7 +302,7 @@ export default function Position() {
         }
 
           {page < totalPages && (
-            <button onClick={() => setPage(page + 1)}><img src="/down.png" className="w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
+            <button onClick={() => setPage(page + 1)}><img src="/down.png" className="-rotate-90 w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
           )}
         </div>
       </center>

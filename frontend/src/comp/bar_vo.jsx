@@ -20,7 +20,7 @@ const BarChartVoComponent = ({ volun , emp , numvolun , volunteer }) => {
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
-      if (width >= 1280) {setBarThickness(90); setFontSize(20);}       // หน้าจอใหญ่ (XL)
+      if (width >= 1280) {setBarThickness(65); setFontSize(20);}       // หน้าจอใหญ่ (XL)
       else if (width >= 1024) {setBarThickness(50); setFontSize(18);}  // หน้าจอ LG
       else if (width >= 768) {setBarThickness(70); setFontSize(13);}   // หน้าจอ MD
       else {setBarThickness(30); setFontSize(8);}                     // หน้าจอเล็ก
@@ -113,7 +113,7 @@ const BarChartVoComponent = ({ volun , emp , numvolun , volunteer }) => {
   };
 
   return (
-    <div className="mx-auto w-full h-[150px] md:h-[300px] lg:h-[300px]">
+    <div className=" mx-auto w-full h-[150px] md:h-[300px] lg:h-[300px]">
       <Bar data={data} options={options} plugins={[ChartDataLabels]} />
       {/* <p className="text-[10px] text-[#7B6ADA] text-right pr-2">อื่นๆ %</p> */}
     </div>

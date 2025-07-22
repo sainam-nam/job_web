@@ -21,7 +21,9 @@ export default function Employer() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/emp?page=${page}&limit=${limit}&keyword=${search}`);
+      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+      const res = await fetch(`${apiUrl}/emp?page=${page}&limit=${limit}&keyword=${search}`);
       const result = await res.json();
 
       if(Array.isArray(result.data)){
@@ -47,13 +49,19 @@ export default function Employer() {
   };
 
   const goToProfile = (val) => {
-    navigate(`/Emp_Pf?emp_id=${val}&type=job`);
+    navigate(`/Emp_Pf?emp_id=${val}&type=job`, {
+    state: {
+      fromStack: [...(location.state?.fromStack || []), location.pathname + location.search],
+    }
+  });
     window.scrollTo(0,0);
   };
   
   const handleStatus = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/empsta/${editData.emp_id}`, {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+      const res = await fetch(`${apiUrl}/empsta/${editData.emp_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -79,7 +87,9 @@ export default function Employer() {
     <main className="flex-1 pt-2 px-2 lg:p-8">
       
       
-      
+      <div className="flex items-center justify-center text-[#7B6ADA] text-xl font-bold">
+        <p>ข้อมูลนายจ้างและผู้จัดกิจกรรม</p>
+      </div>
       <div className="flex justify-between items-center mt-1 mb-3 md:mt-2 md:mb-2">
         <h1 className="text-[#7B6ADA] text-[10px] font-bold md:text-lg">ทั้งหมด {total} รายการ</h1>
         
@@ -95,6 +105,7 @@ export default function Employer() {
         </div>*/}
         <label className="input w-30 h-7 bg-white rounded-lg border border-[#7B6ADA]">
           
+          <div className="tooltip tooltip-bottom" data-tip="ค้นหาจากชื่อ-นามสกุล">
           <input 
             type="search" 
             className="text-[#7B6ADA] text-xs" 
@@ -106,6 +117,7 @@ export default function Employer() {
             }}
             
           />
+          </div>
           <button>
             <MdOutlineSearch className="fill-[#7B6ADA] mt-1 md:size-5" />
           </button>
@@ -117,7 +129,7 @@ export default function Employer() {
           <thead>
             <tr className="bg-[#D9D9D9] text-[10px] md:text-lg text-[#7B6ADA] font-bold text-center">
               <th className="w-[5%]">ที่</th>
-              <th className="w-[10%] hidden md:table-cell">รูป</th>
+              <th className="w-[8%] hidden md:table-cell md:text-center">รูป</th>
               <th className="w-[25%]">ชื่อ-นามสกุล</th>
               <th className="w-[5%]">จำนวนงาน</th>
               <th className="w-[5%]">จำนวน<br />กิจกรรมจิตอาสา</th>
@@ -129,10 +141,12 @@ export default function Employer() {
             {data.map((val, index) => (
               <tr key={index} className="hover:bg-[#D9D9D9] text-[10px] md:text-lg">
                 <td className="text-center">{(page-1) * limit + index +1}</td>
-                <td className="hidden md:table-cell text-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                  </svg>
+                <td className="hidden md:table-cell md:text-center">
+                  {val.picture ? (
+                          <img src={`/uploads/${val.picture}`} className="rounded-full w-full" />
+                        ) : (
+                          <img src={`/uploads/nophoto.png`} className="rounded-full w-full" />
+                        )}
 
                 </td>
                 <td className="">{val.fullname || "N/A"}</td>
@@ -151,23 +165,28 @@ export default function Employer() {
 
                 <td>
                   <div className="flex justify-center items-center gap-0.5">
-                    <button className="btn btn-xs md:text-lg bg-[#7B6ADA] border-[#7B6ADA] text-2xl font-bold text-white mb-1 w-8 h-8 md:w-9 md:w-9 lg:w-10 lg:w-10" onClick={() => goToProfile(val.emp_id)}>
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="currentColor" className="size-8">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                      </svg>
-                    </button>
-                  
+                    <div className="tooltip tooltip-left" data-tip="ดูโปรไฟล์">
+                      <button className="btn btn-xs md:text-lg bg-[#7B6ADA] border-[#7B6ADA] text-2xl font-bold text-white mb-1 w-8 h-8 md:w-9 md:w-9 lg:w-10 lg:w-10" onClick={() => goToProfile(val.emp_id)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="currentColor" className="size-8">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        </svg>
+                      </button>
+                    </div>
                     {val.status === "ON" ? (
+                      <div className="tooltip tooltip-left" data-tip="คลิกเพื่อระงับ">
                         <button className="btn btn-xs md:text-lg btn-success text-2xl text-white mb-1 w-8 h-8 md:w-9 md:w-9 lg:w-10 lg:w-10" onClick={() => handleSta(val)}>
                           <CheckIcon strokeWidth={5} />
                         </button>
+                      </div>
                     ) : (
+                      <div className="tooltip tooltip-left" data-tip="คลิกเพื่อคืนสิทธิ์">
                         <button className="btn btn-xs md:text-lg btn-error text-[10px] text-white mb-1 w-8 h-8 md:w-9 md:w-9 lg:w-10 lg:w-10" onClick={() => handleSta(val)}>
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={5} stroke="currentColor" className="size-8">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                           </svg>
                         </button>
+                      </div>
                     )
                     }
                   </div>
@@ -181,7 +200,7 @@ export default function Employer() {
       <center>
         <div className="join items-center gap-2 my-2">
           {page > 1 && (
-            <button onClick={() => setPage(page - 1)}><img src="/up.png" className="w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
+            <button onClick={() => setPage(page - 1)}><img src="/up.png" className="-rotate-90 w-4 h-4 md:w-6 md:h-6 hover:shadow-r-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
           )}
 
         {total > 0 ? (
@@ -192,7 +211,7 @@ export default function Employer() {
         }
 
           {page < totalPages && (
-            <button onClick={() => setPage(page + 1)}><img src="/down.png" className="w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
+            <button onClick={() => setPage(page + 1)}><img src="/down.png" className="-rotate-90 w-4 h-4 md:w-6 md:h-6 hover:shadow-l-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
           )}
         </div>
       </center>

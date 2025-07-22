@@ -11,6 +11,7 @@ export default function Dashboardvolun() {
   const [voluntCount, setVoluntCount] = useState(0);
   const [volunTypeCount, setVolunTypeCount] = useState(0);
   const [numvolunCount, setNumVolunCount] = useState(0);
+  const [Pie_vo, setPie_vo] = useState({ap: [], count: []});
   // const [gotJob, setgotJob] = useState(0);
   // const [lookingForJob, setlookingForJob] = useState(0);
   const volunnum = String(volunCount).length;
@@ -29,7 +30,9 @@ export default function Dashboardvolun() {
 
   const fetchData = async () => {
   try {
-    const res = await fetch(`http://localhost:8081/apidash_volun`);
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+    const res = await fetch(`${apiUrl}/apidash_volun`);
     const result = await res.json();
 
     if (typeof result === 'object' &&
@@ -66,7 +69,19 @@ export default function Dashboardvolun() {
         console.error("Data format error:", result);
         setLabels([]);
       }
-    
+
+    if(Array.isArray(result.pie_vo)){
+          //console.log("sql", res)
+          const ap = result.pie_vo.map(item => item.ap);
+          const count = result.pie_vo.map(item => item.count);
+          setPie_vo({
+            ap,
+            count
+          });
+        } else {
+          console.error("Data format error:", result);
+          setPie_vo([]);
+        }
 
   } catch (err) {
     console.error('Fetch error:', err);
@@ -107,14 +122,15 @@ export default function Dashboardvolun() {
 
         {/* กราฟ / Chart */}
         <div className="grid grid-cols-2 gap-4 mt-6">
-          <div className="p-2 bg-white shadow-md rounded-3xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+          <div className="flex flex-col items-between p-2 bg-white shadow-md rounded-3xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
             <div className="pt-2 pb-1 text-[#7B6ADA] font-bold text-sm">เปรียบเทียบ</div> 
-            <BarChartVoComponent volun={volunCount} emp={empCount} volunteer={voluntCount} numvolun={numvolunCount} />
-            
+            <div className="mt-7 md:mt-0">
+              <BarChartVoComponent volun={volunCount} emp={empCount} volunteer={voluntCount} numvolun={numvolunCount} />
+            </div>
           </div>
           <div className="pt-2 pb-5 px-2 bg-white shadow-md rounded-3xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
-            <div className="pt-2 pb-1 text-[#7B6ADA] font-bold text-sm">จังหวัด</div> 
-            {/* <PieChartVoComponent gotJob={gotJob} lookingForJob={lookingForJob} /> */}
+            <div className="pt-2 pb-1 text-[#7B6ADA] font-bold text-sm">กิจกรรมในแต่ละอำเภอ</div> 
+            <PieChartVoComponent pieinfo={Pie_vo} />
           </div>
         </div>
         {/* กราฟ / Chart */}

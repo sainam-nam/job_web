@@ -5,11 +5,12 @@ import axios from 'axios';
 function ForgetPassword() {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
     const handleSubmit = async(e) =>{
         e.preventDefault();
         try {
-            const response = await axios.post("http://localhost:8081/forgot-password", {
+            const response = await axios.post(`${apiUrl}/forgot-password`, {
                 email: email
             });
             setMessage("ส่งลิงก์รีเซ็ตรหัสผ่านไปยังอีเมลของคุณแล้ว");

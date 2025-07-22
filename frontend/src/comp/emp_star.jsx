@@ -8,7 +8,9 @@ const EmpRating = ({ emp_id , cl }) => {
   useEffect(() => {
     //console.log('emp_id:', cl);
     //if (!emp_id) return;
-    fetch(`http://localhost:8081/emp_rating?emp_id=${emp_id}`)
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+    fetch(`${apiUrl}/emp_rating?emp_id=${emp_id}`)
       .then(res => res.json())
       .then(data => setStars(data.stars || 0));
   }, [emp_id , cl]);
@@ -27,7 +29,7 @@ const EmpRating = ({ emp_id , cl }) => {
   // };
 
   return (
-    <div className={`flex text-[${cl}] text-xl md:text-3xl lg:text-4xl xl:text-5xl`}>
+    <div className={`flex text-[${cl}] text-xl lg:text-2xl xl:text-3xl`}>
       {[...Array(full)].map((_, i) => <FaStar key={i} />)}
       {half && <FaStarHalfAlt />}
       {[...Array(empty)].map((_, i) => <FaRegStar key={i + full + 1} />)}

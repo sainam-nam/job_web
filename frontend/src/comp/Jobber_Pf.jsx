@@ -8,9 +8,41 @@ import EmpRating_volun from "./emp_star_volun";
 import { FaCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { HiChevronLeft } from "react-icons/hi";
-import { CheckIcon } from '@heroicons/react/24/outline'
+import { CheckIcon } from '@heroicons/react/24/outline';
+import axios from "axios";
+import { FaGraduationCap, FaUniversity, FaBook, FaCalendarAlt, FaAward , FaCheckCircle, FaSearch } from 'react-icons/fa';
+import { MdSchool } from 'react-icons/md';
+import { AlertTriangle } from 'lucide-react';
+import { Brain, Smile } from "lucide-react";
+
+const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 function jobber_Pf() {
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // ถ้าไม่มี token อาจ redirect ไป login
+
+      window.location.href = "/login";
+      return;
+    }
+
+    axios.get(`${apiUrl}/jobber_profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+      setUserData(res.data.user);
+    })
+    .catch(err => {
+      console.error(err);
+      // token หมดอายุหรือไม่ถูกต้อง -> กลับหน้า login
+      alert("เกิดข้อผิดพลาด กรุณาเข้าสู่ระบบอีกครั้ง");
+      window.location.href = "/login";
+    });
+  }, []);
+
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -46,7 +78,9 @@ function jobber_Pf() {
   
   const fetchData = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/jobber_pf?jobber_id=${id}`);
+      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+      const res = await fetch(`${apiUrl}/jobber_pf?jobber_id=${id}`);
       const result = await res.json();
 
       if (typeof result === 'object' && 
@@ -132,66 +166,103 @@ function jobber_Pf() {
     return `${day}/${month}/${year}`;
   }
   
+
+
+  const queryType = queryParams.get("type") || "job"; // default เป็น "job"
+
+  function renderWorkSchedule(code) {
+  if (!code || code.length !== 7) return "ข้อมูลไม่ถูกต้อง";
+
+  const daysOfWeek = ["จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"];
+  const chars = code.split("");
+
+  // ถ้าทำงานครบทั้ง 7 วัน
+  if (chars.every(char => char === "1")) {
+    return <span>ทำงานได้ทุกวัน</span>;
+  }
+
+  // เก็บวันทำงาน (เลข 1)
+  const workingDays = chars.map((char, index) => char === "1" ? index : -1).filter(index => index !== -1);
+
+  // ตรวจเช็คว่าเป็นช่วงต่อเนื่องไหม
+  const ranges = [];
+  let start = workingDays[0];
+  let end = start;
+
+  for (let i = 1; i < workingDays.length; i++) {
+    if (workingDays[i] === end + 1) {
+      end = workingDays[i];
+    } else {
+      ranges.push([start, end]);
+      start = workingDays[i];
+      end = start;
+    }
+  }
+  ranges.push([start, end]); // push ช่วงสุดท้าย
+
+  // สร้างข้อความ
+  const result = ranges.map(([startIdx, endIdx]) => {
+    if (startIdx === endIdx) {
+      return daysOfWeek[startIdx]; // วันเดียว
+    } else {
+      return `${daysOfWeek[startIdx]}-${daysOfWeek[endIdx]}`; // ช่วงวัน
+    }
+  });
+
+  return <span>{result.join(", ")}</span>;
+}
   const handleTabClick = (type) => {
     navigate(`/Jobber_Pf?i=${id}&type=${type}`);
     window.scrollTo(0,0);
   };
-  const queryType = queryParams.get("type") || "job"; // default เป็น "job"
 
-  const daysOfWeek = ["จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"];
-
-  function renderWorkSchedule(code) {
-    if (!code || code.length !== 7) return "ข้อมูลไม่ถูกต้อง";
-
-    const chars = code.split("");
-    const workDays = [];
-    const offDays = [];
-
-    chars.forEach((char, index) => {
-      if (char === "1") {
-        workDays.push(daysOfWeek[index]);
-      } else {
-        offDays.push(daysOfWeek[index]);
-      }
-    });
-
-    const showOffDays = offDays.length <= 3;
-    const daysToShow = showOffDays ? offDays : workDays;
-    const label = showOffDays ? "วันหยุด" : "วันทำงาน";
-
-    return (
-      <div>
-        {label}: {daysToShow.length > 0 ? daysToShow.join(", ") : "ไม่มี"}
-      </div>
-    );
-  }
   const goToProfile = (val) => {
-    navigate(`/Job_Post?pi=${val}`);
+    navigate(`/Job_Post?pi=${val}&i=${id}`,
+      {state: { from: location.pathname }});
     window.scrollTo(0,0);
   };
   const goToVolunPost = (val) => {
-    navigate(`/Volun_Post?pi=${val}`);
+    navigate(`/Volun_Post?pi=${val}&i=${id}`,
+      {state: { from: location.pathname }});
     window.scrollTo(0,0);
   };
+
+  const handleBack = () => {
+  const from = location.state?.from;
+  if (from) {
+    navigate(from);
+  } else {
+    navigate('/Admin/jobber'); // fallback หน้าหลัก
+  }
+};
+
     return (
-      <div>
-        <Navbar />
+      <div className="">
+        {userData && <Navbar user={userData} />}
         <div className="bg-[#7B6ADA] pl-2 md:pl-4 lg:pl-6 xl:pl-8">
           <button
-            onClick={() => navigate(-1)}
-            className="btn btn-xs md:btn-sm lg:btn-lg xl:btn-xl border-white p-2 md:p-3 lg:p-4 xl:p-5  bg-white text-[#7B6ADA] rounded-xl md:rounded-2xl lg:rounded-3xl xl:rounded-4xl"
+            onClick={handleBack}
+            className="btn btn-xs md:btn-sm lg:btn-lg border-white p-2 md:p-3 lg:p-4 xl:p-5  bg-white text-[#7B6ADA] rounded-xl md:rounded-2xl lg:rounded-3xl xl:rounded-4xl"
           >
             <HiChevronLeft size={15}/> ย้อนกลับ
           </button>
         </div>
         {/* <center><h1>Job post {id}</h1></center> */}
-        <div className="flex gap-4 bg-[#7B6ADA] px-7 py-5 md:px-20 md:py-7 lg:px-30 lg:py-14 xl:px-50 xl:py-20"> 
+        <div className="flex flex-col md:flex-row items-center justify-center gap-2  px-7 pb-5 md:px-20 md:pb-7 lg:px-30 lg:pb-14 xl:px-50 xl:pb-20"> 
           
-          <img src="gray.png" className="w-50 h-30 md:w-60 md:h-40 lg:w-80 lg:h-55 xl:w-90 xl:h-65 rounded-2xl lg:rounded-4xl"></img>
-          <div className="w-full pl-2 md:pl-4 lg:pl-6 xl:pl-10">
+          <div className="avatar">
+            <div className="w-24 sm:w-28 md:w-35 lg:w-40 rounded-full">
+              {jobber[0]?.picture ? (
+                            <img src={`/uploads/${jobber[0]?.picture}`} />
+                          ) : (
+                            <img src={`/uploads/nophoto.png`}  />
+                          )}
+            </div>
+          </div>
+          <div className="pl-2 md:pl-4 lg:pl-6 xl:pl-10">
             <div className="flex flex-col gap-1 lg:gap-2 xl:gap-3">
               <div className="flex gap-1 lg:gap-2 xl:gap-3">
-                <a className="text-md md:text-xl lg:text-3xl xl:text-5xl font-bold">{jobber[0]?.fullname}</a>
+                <a className="text-lg md:text-2xl lg:text-3xl xl:text-5xl font-bold">{jobber[0]?.fullname}</a>
                   {jobber[0]?.status === "ON" ? (
                           <button className="text-success w-5 h-5 md:w-7 md:h-7 lg:w-9 lg:h-9 xl:w-13 xl:h-13">
                             <CheckIcon strokeWidth={6} />
@@ -205,9 +276,29 @@ function jobber_Pf() {
                       )
                       }
                 </div>
-              <a className="text-xs md:text-sm lg:text-xl xl:text-2xl font-bold pt-3 lg:pt-4">เพศ {jobber[0]?.gender}</a>
-              <a className="text-xs md:text-sm lg:text-xl xl:text-2xl font-bold">ต.{jobber[0]?.tb} อ.{jobber[0]?.ap} จ.{jobber[0]?.jw}</a>
-              <a className="text-xs md:text-sm lg:text-xl xl:text-2xl font-bold pt-2">{(jobber[0]?.work_status) === "JOB" ? "ได้งานแล้ว" : "หางานอยู่"}</a>
+              {(jobber[0]?.work_status) === "JOB" ? (
+                  <button className="flex items-center justify-center gap-2 bg-green-500 text-white text-xs md:text-sm lg:text-xl xl:text-2xl font-bold px-4 py-2 rounded-full shadow-md">
+                    <FaCheckCircle className="text-white" />
+                    ได้งานแล้ว
+                  </button>
+                ) : (
+                  <button className="flex items-center justify-center gap-2 bg-gray-400 text-white text-xs md:text-sm lg:text-xl xl:text-2xl font-bold px-4 py-2 rounded-full shadow-md">
+                    <FaSearch className="text-white" />
+                    หางานอยู่
+                  </button>
+                )}
+              <a className="text-xs md:text-sm lg:text-xl xl:text-2xl font-bold pt-2">
+                เพศ {jobber[0]?.gender === "M"
+                      ? "ชาย"
+                      : jobber[0]?.gender === "F"
+                      ? "หญิง"
+                      : jobber[0]?.gender || "ไม่ระบุ"}
+                      
+                      {jobber[0]?.LG
+                        ? "  🌈 เป็นส่วนหนึ่งของ LGBTQ+"
+                        : "  ไม่เป็นส่วนหนึ่งของ LGBTQ+"}
+              </a>
+              <a className="text-xs md:text-sm lg:text-xl xl:text-2xl font-bold pt-2">ที่อยู่ ต.{jobber[0]?.tb} อ.{jobber[0]?.ap} จ.{jobber[0]?.jw}</a>
 
             </div>
           </div>  
@@ -215,254 +306,362 @@ function jobber_Pf() {
 
         <div className="relative flex items-center justify-center bg-white p-3">
           <button onClick={() => handleTabClick("job")} className={`z-10 btn btn-xs md:btn-sm ${queryType  === "job" ? "bg-[#7B6ADA] text-white" : "bg-white text-[#7B6ADA]"} border-[#7B6ADA] border-3 rounded-full pt-0.5 px-5 w-25 md:w-35 lg:w-40 hover:w-40 lg:text-sm`}>งาน</button>
-          <button onClick={() => handleTabClick("volunteer")} className={`-ml-5 btn btn-xs md:btn-sm ${queryType  === "volunteer" ? "bg-[#7B6ADA] text-white z-10" : "bg-white text-[#7B6ADA] z-0"} border-3 pt-0.5 px-5 w-30 md:w-40  border-[#7B6ADA] rounded-full hover:w-40 lg:text-sm`}>กิจกรรมจิตอาสา</button>
+          <button onClick={() => handleTabClick("volunteer")} className={`-ml-5 btn btn-xs md:btn-sm ${queryType  === "volunteer" ? "bg-[#7B6ADA] text-white z-10" : "bg-white text-[#7B6ADA] z-0"} border-3 pt-0.5 pl-5 md:w-40  border-[#7B6ADA] rounded-full hover:w-40 lg:text-sm`}>กิจกรรมจิตอาสา</button>
         </div>
         {queryType === "job" && (
-          <div className="bg-white px-5 py-3 md:px-15 md:py-6 lg:px-25 lg:py-12 xl:px-35 xl:py-14">
+          <div className="bg-white px-5 py-3 md:px-15 md:py-6 lg:px-30 lg:py-12 xl:px-50 xl:py-14">
           
-              <div className="py-2 md:py-4 lg:py-6">
-                <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#7B6ADA] ml-2 mb-1 md:ml-4 md:mb-2">ประวัติการศึกษา</p>
-                <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-4 md:ml-10"><b>ระดับการศึกษา</b> {jobber[0]?.edu_name}</div>
-                <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-4 md:ml-10"><b>วุฒิการศึกษา</b> {jobber[0]?.qualification}</div>
-                <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-4 md:ml-10"><b>สถานบัน</b> {jobber[0]?.institution}</div>
-                <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-4 md:ml-10"><b>คณะ / สาขา</b> {jobber[0]?.major}</div>
-                <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-4 md:ml-10"><b>วันที่จบการศึกษา</b> {jobber[0]?.year_graduat}</div>
-                <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-4 md:ml-10"><b>เกรด / ผลการเรียน</b> {jobber[0]?.grade}</div>
-                <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-4 md:ml-10"><b>ระดับการศึกษา</b> {jobber[0]?.edu_cert}</div>
-              </div>
-              
+              {/* งานที่สนใจ */}
+                <div className="flex flex-col bg-[#D9D9D9] rounded-3xl p-5 mb-5 md:py-4 lg:py-6" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+                  <p className="text-xl md:text-2xl lg:text-3xl font-bold  text-[#7B6ADA] ml-2 mb-1 md:ml-4 md:mb-2">
+                    งานที่สนใจ
+                  </p>
 
-              <div className="py-2 md:py-4 lg:py-6">
-                <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#7B6ADA] ml-2 mb-1 md:ml-4 md:mb-2">ประสบการณ์การทำงาน</p>
-                {/* table experjob */}
-              <div className="flex flex-col justify-center items-center">
-                
-                {/* ประสบการณ์งานแต่ละแถวเริ่มนี่ วนปสกงาน */}
-                  
-                    <div  className="flex flex-col justify-center w-full p-2 lg:p-4 xl:p-6 bg-white text-[#7B6ADA] text-xs font-bold lg:text-2xl xl:text-3xl" >
-                      
-                      <div className="flex items-center justify-center ">
-                        <table >
-                          <tbody>
-                            <tr className="bg-[#7B6ADA] text-white h-8 border-b">
-                              <th className="w-5 md:w-10 lg:w-10 xl:w-15">ที่</th>
-                              <th className="w-40 md:w-40 lg:w-50 xl:w-60">ตำแหน่งงาน</th>
-                              <th className="w-30 md:w-80 lg:w-90 xl:w-100">บริษัท</th>
-                              <th className="w-20 md:w-80 lg:w-90 xl:w-100">ระยะเวลา</th>
-                            </tr>
-                            {work_exper.map((work) => (
-                              <tr key={work.no} className="h-15 lg:h-15 xl:h-12 border-b">
-                                <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{work.no}</a></td>
-                                <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{work.position_name}</a></td>
-                                <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{work.company}</a></td>
-                                <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{work.duration}</a></td>
-
-                              </tr>
-                            ))}
-                            
-
-                          </tbody>
-                        </table>
-                        
-                      </div>
-                        
-                    </div>
-                  
-                  {/* /end loop for exper/ */}
-              </div>
-              {/* /end flex exper/ */}
-              </div>
-              <div className="py-2 md:py-4 lg:py-6">
-                <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#7B6ADA] ml-2 mb-1 md:ml-4 md:mb-2">งานที่สนใจ</p>
-                  {/* table interest_work */}
-                  <div className="flex flex-col justify-center items-center">
-                    
-                    {/* ประสบการณ์งานแต่ละแถวเริ่มนี่ วนปสกงาน */}
-                      
-                        <div  className="flex flex-col justify-center w-full p-2 lg:p-4 xl:p-6 bg-white text-[#7B6ADA] text-xs font-bold lg:text-2xl xl:text-3xl" >
-                          
-                          <div className="flex items-center justify-center mt-2 md:mt-4 lg:mt-8">
-                            <table>
-                              <tbody>
-                                <tr className="bg-[#7B6ADA] text-white h-8 border-b">
-                                  <th className="w-5 md:w-10 lg:w-10 xl:w-15">ที่</th>
-                                  <th className="w-50 md:w-40 lg:w-50 xl:w-60">ตำแหน่งงาน</th>
-                                  <th className="w-20 md:w-80 lg:w-90 xl:w-100">เงินเดือน</th>
-                                  <th className="w-30 md:w-80 lg:w-90 xl:w-100">วัน เวลาที่ต้องการ</th>
-                                  
-                                  
+                  {interests_work.length > 0 ? (
+                    <div className="flex flex-col justify-center items-center">
+                      <div className="flex flex-col justify-center w-full p-2 lg:p-4 xl:p-6 bg-[#D9D9D9] text-[#7B6ADA] text-xs font-bold lg:text-xl">
+                        <div className="flex items-center justify-center w-full">
+                          <div className="overflow-hidden rounded-2xl w-full">
+                            <table className="w-full border-collapse">
+                              <thead>
+                                <tr className="bg-[#7B6ADA] text-white h-10">
+                                  <th className="text-center p-2">ที่</th>
+                                  <th className="text-center p-2">ตำแหน่งงาน</th>
+                                  <th className="text-center p-2">เงินเดือน</th>
+                                  <th className="text-center p-2">วัน เวลาที่ต้องการ</th>
                                 </tr>
-                                {interests_work.map((work , index) => (
-                                  <tr key={index+1} className="h-15 lg:h-10 xl:h-12 border-b">
-                                    <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{index+1}</a></td>
-                                    <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{work.position_name}</a></td>
-                                    <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{work.salary}</a></td>
-                                    <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{work.hours}{renderWorkSchedule(work.days)}</a></td>
-                                    
-                                    
-
+                              </thead>
+                              <tbody>
+                                {interests_work.map((work, index) => (
+                                  <tr key={index + 1} className="bg-white border-b hover:bg-[#f1f0ff]">
+                                    <td className="text-center align-middle p-2 text-[10px] md:text-sm lg:text-lg">{index + 1}</td>
+                                    <td className="text-center align-middle p-2 text-[10px] md:text-sm lg:text-lg">{work.position_name}</td>
+                                    <td className="text-center align-middle p-2 text-[10px] md:text-sm lg:text-lg">{work.salary}</td>
+                                    <td className="text-center align-middle p-2 text-[10px] md:text-sm lg:text-lg">
+                                      {work.hours} - {work.end_hour} น.<br></br>{renderWorkSchedule(work.days)}
+                                    </td>
                                   </tr>
                                 ))}
-                                
-
                               </tbody>
                             </table>
-                        
+                          </div>
+                        </div>
                       </div>
-                        
                     </div>
-                  
-                  {/* /end loop for exper/ */}
+                  ) : (
+                    <div className="flex items-center justify-center text-[#7B6ADA] gap-2 text-sm md:text-lg lg:text-xl font-semibold mt-4">
+                      <AlertTriangle className="w-6 h-6  text-yellow-500" />
+                      ยังไม่ได้ลงข้อมูลงานที่สนใจไว้
+                    </div>
+                  )}
+                </div>
+
+              <div className="flex flex-col bg-[#D9D9D9] rounded-3xl p-5 mb-5 md:py-4 lg:py-6" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+                <p className="text-xl md:text-2xl lg:text-3xl font-bold  text-[#7B6ADA] ml-2 mb-1 md:ml-4 md:mb-2">
+                  งานที่จับคู่แล้ว
+                </p>
+                <div className="p-2 lg:p-4 xl:p-6 bg-[#D9D9D9] text-[#7B6ADA] text-xs font-bold lg:text-2xl xl:text-3xl">
+                  <table className="w-full table-auto border-separate border-spacing-0 overflow-hidden rounded-3xl shadow-md">
+                    <thead>
+                      <tr>
+                        <th className="bg-[#7B6ADA] text-white text-left p-3 text-xs font-bold lg:text-xl">
+                          ทั้งหมด {job_matchedCount} งาน
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody className="bg-white">
+                      {job_matched.map((post) => (
+                        <tr key={post.post_id} className="border-t border-gray-200">
+                          <td className="p-4 text-[#7B6ADA] text-xs font-bold lg:text-xl">
+                            <div className="flex justify-between items-center">
+                              <span className="font-bold">{post.position_name || 'ตำแหน่งงาน'}</span>
+                              <span className="text-[8px] md:text-sm text-right pt-1">
+                                วันที่จับคู่ {post.date_time ? formatDateToThaiShort(post.date_time) : 'ไม่มีวันที่'}
+                              </span>
+                            </div>
+
+                            <div className="mt-2 w-full">
+                              {/* หัวข้อ */}
+                              <p className="text-[10px] md:text-sm text-[#7B6ADA] font-semibold mb-1">
+                                ค่าความตรงกับคุณสมบัติ
+                              </p>
+
+                              {/* แถบรวมตรง-ไม่ตรง */}
+                              <div className="w-full bg-[#C0BBEB] rounded-full h-7 relative overflow-hidden">
+                                {/* แถบฝั่งตรง */}
+                                <div
+                                  className="bg-[#7B6ADA] h-7 rounded-full"
+                                  style={{ width: `${post.match}%` }}
+                                ></div>
+
+                                {/* ข้อความกำกับซ้าย-ขวา */}
+                                <div className="absolute inset-0 flex justify-between items-center px-2 text-[10px] md:text-xs font-bold">
+                                  <span className="text-white">ตรง {post.match}%</span>
+                                  <span className="text-[#7B6ADA]">ไม่ตรง {post.not_match}%</span>
+                                </div>
+                              </div>
+                            </div>
+
+
+
+                            <div className="flex justify-end mt-2">
+                              <button
+                                onClick={() => goToProfile(post.post_id)}
+                                className="btn btn-sm lg:btn-lg  border border-[#7B6ADA] bg-[#7B6ADA] text-white rounded-xl"
+                              >
+                                รายละเอียดงาน
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {/* /end flex job/ */}
               </div>
-              {/* /end flex exper/ */}              </div>
+
+              {/* ประสบการณ์การทำงาน */}
+                <div className="flex flex-col bg-[#D9D9D9] p-5 mb-5 rounded-3xl p-4 md:py-4 lg:py-6" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+                  <p className="text-xl md:text-2xl lg:text-3xl font-bold  text-[#7B6ADA] ml-2 mb-1 md:ml-4 md:mb-2">
+                    ประสบการณ์การทำงาน
+                  </p>
+
+                  {work_exper.length > 0 ? (
+                    <div className="flex flex-col justify-center items-center">
+                      <div className="flex flex-col justify-center w-full p-2 lg:p-4 xl:p-6 bg-[#D9D9D9] text-[#7B6ADA] text-xs font-bold lg:text-xl">
+                        <div className="flex items-center justify-center w-full">
+                          <div className="overflow-hidden rounded-2xl w-full">
+                            <table className="w-full border-collapse">
+                              <thead>
+                                <tr className="bg-[#7B6ADA] text-white h-10">
+                                  <th className="text-center p-2">ที่</th>
+                                  <th className="text-center p-2">ตำแหน่งงาน</th>
+                                  <th className="text-center p-2">บริษัท</th>
+                                  <th className="text-center p-2">ระยะเวลา</th>
+                                  <th className="text-center p-2">รายละเอียดงาน</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {work_exper.map((work) => (
+                                  <tr key={work.no} className="bg-white border-b hover:bg-[#f1f0ff]">
+                                    <td className="text-center p-2 text-[10px] md:text-sm lg:text-lg">{work.no}</td>
+                                    <td className="text-center p-2 text-[10px] md:text-sm lg:text-lg">{work.position_name}</td>
+                                    <td className="text-center p-2 text-[10px] md:text-sm lg:text-lg">{work.company}</td>
+                                    <td className="text-center p-2 text-[10px] md:text-sm lg:text-lg">{work.duration}</td>
+                                    <td className="text-center p-2 text-[10px] md:text-sm lg:text-lg">{work.job_description}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center text-[#7B6ADA] gap-2 text-sm md:text-lg lg:text-xl font-semibold mt-4">
+                      <AlertTriangle className="w-6 h-6  text-yellow-500" />
+                      ยังไม่ได้ลงข้อมูลประสบการณ์การทำงานไว้
+                    </div>
+                  )}
+                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <div className="bg-[#D9D9D9] rounded-3xl p-5 mb-5 md:p-6 lg:p-8 shadow-md">
+                <p className="text-xl md:text-2xl lg:text-3xl font-bold text-[#7B6ADA] mb-4 flex items-center">
+                  <FaGraduationCap className="mr-2" /> ประวัติการศึกษา
+                </p>
+
+                <div className="flex justify-center">
+                  <div className="space-y-3 flex flex-col text-[#7B6ADA] text-sm md:text-base lg:text-xl">
+                    <div className="flex items-center">
+                      <MdSchool className="mr-2" />
+                      <b className="w-40 inline-block">ระดับการศึกษา:</b> {jobber[0]?.edu_name}
+                    </div>
+
+                    <div className="flex items-center">
+                      <FaAward className="mr-2" />
+                      <b className="w-40 inline-block">วุฒิการศึกษา:</b> {jobber[0]?.qualification}
+                    </div>
+
+                    <div className="flex items-center">
+                      <FaUniversity className="mr-2" />
+                      <b className="w-40 inline-block">สถาบัน:</b> {jobber[0]?.institution}
+                    </div>
+
+                    <div className="flex items-center">
+                      <FaBook className="mr-2" />
+                      <b className="w-40 inline-block">คณะ / สาขา:</b> {jobber[0]?.major}
+                    </div>
+
+                    <div className="flex items-center">
+                      <FaCalendarAlt className="mr-2" />
+                      <b className="w-40 inline-block">วันที่จบการศึกษา:</b> {jobber[0]?.year_graduat}
+                    </div>
+
+                    <div className="flex items-center">
+                      <FaAward className="mr-2" />
+                      <b className="w-40 inline-block">เกรด / ผลการเรียน:</b> {jobber[0]?.grade}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
               
 
-              <div className="py-2 md:py-4 lg:py-6">
-                <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#7B6ADA] ml-2 mb-1 md:ml-4 md:mb-2">ทักษะ</p>
-                <p className="text-sm md:text-lg lg:text-2xl xl:text-3xl text-[#7B6ADA] ml-5 mb-1 md:ml-4 md:mb-2">ทักษะด้านความรู้</p>
-                {hs.map((hs , index) => (
-                  <div key={index+1} className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-7 md:ml-10">{index+1}. {hs.hardskill_name}</div>
-                ))}
-                <p className="text-sm md:text-lg lg:text-2xl xl:text-3xl text-[#7B6ADA] ml-5 mb-1 md:ml-4 md:mb-2">ทักษะด้านอารมณ์</p>
-                {ss.map((ss , index) => (
-                  <div key={index+1} className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-7 md:ml-10">{index+1}. {ss.softskill_name}</div>
-                ))}              </div>
+
               
-              {/* table job */}
-              <div className="flex flex-col py-2 md:py-4 lg:py-6">
-                <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#7B6ADA] ml-2 mb-2 md:ml-4 md:mb-2">งานที่จับคู่แล้ว</p>
-                <div className="flex flex-col justify-center w-full p-2 lg:p-4 xl:p-6 bg-[#D9D9D9] text-[#7B6ADA] text-xs font-bold lg:text-2xl xl:text-3xl border-b" >
-                      ทั้งหมด {job_matchedCount} งาน
-                </div>
-                {/* งานแต่ละแถวเริ่มนี่ วนงาน */}
-                  {job_matched.map((post) => (
-                    <div key={post.post_id} className="flex flex-col justify-center w-full p-2 lg:p-4 xl:p-6 bg-white text-[#7B6ADA] text-xs font-bold lg:text-2xl xl:text-3xl border-b" >
-                      <div className="flex justify-between items-center">
-                        <p className="text-xs md:text-xl lg:text-2xl xl:text-3xl font-bold">{post.position_name ? (post.position_name) : 'ตำแหน่งงาน'}</p>
-                        <p className="text-[8px] font-bold md:text-sm lg:text-xl xl:text-2xl text-right pt-1">วันที่จับคู่ {post.date_time ? formatDateToThaiShort(post.date_time) : 'ไม่มีวันที่'}</p>
-                      </div>
-                      <div className="flex items-center justify-center mt-2 md:mt-4 lg:mt-8">
-                        <table>
-                          <tbody>
-                            <tr className="lg:h-10 xl:h-12">
-                              <td className="w-5 md:w-10 lg:w-10 xl:w-15"><FaCircle color="#7B6ADA" size={12} /></td>
-                              <td className="w-30 md:w-40 lg:w-50 xl:w-60"><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">ค่าที่คุณสมบัติตรง</a></td>
-                              <td className="w-40 md:w-80 lg:w-90 xl:w-100"><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{post.match} %</a></td>
-                            </tr>
-                            <tr className="lg:h-10 xl:h-12">
-                              <td><FaCircle color="#7B6ADA" size={12} /></td>
-                              <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">ค่าที่คุณสมบัติไม่ตรง</a></td>
-                              <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{post.not_match} %</a></td>
-                            </tr>
-                            
-                          </tbody>
-                        </table>
-                        
-                      </div>
-                        <div className="flex justify-end">
-                          <button 
-                            onClick={() => goToProfile(post.post_id)}
-                            className="btn btn-xs md:btn-sm lg:btn-lg xl:btn-xl w-20 md:w-25 lg:w-35 xl:w-45 border border-[#7B6ADA] bg-[#7B6ADA] text-white rounded-xl md:rounded-2xl lg:rounded-3xl xl:rounded-4xl"
-                          >รายละเอียด</button>
-                        </div>
+
+              <div className="flex flex-col bg-[#D9D9D9] rounded-3xl p-5 mb-5 md:py-4 lg:py-6" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+                <p className="text-xl md:text-2xl lg:text-3xl font-bold  text-[#7B6ADA] ml-2 mb-1">
+                  ทักษะ
+                </p>
+
+                {/* กล่องพื้นหลังทักษะ */}
+                <div className="p-4 text-[#7B6ADA]">
+                  
+                  {/* ทักษะด้านความรู้ */}
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Brain className="w-5 h-5 md:w-6 md:h-6" />
+                      <p className="text-sm md:text-base lg:text-xl font-semibold">ทักษะด้านความรู้</p>
                     </div>
-                  ))}
-                  {/* /end loop for job/ */}
+
+                    {hs.length > 0 ? (
+                      hs.map((hs, index) => (
+                        <div key={index} className="ml-6 md:ml-10 text-[10px] md:text-sm lg:text-lg">
+                          {index + 1}. {hs.hardskill_name}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="flex items-center gap-2 ml-6 mt-2 text-sm md:text-lg font-medium">
+                        <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                        ยังไม่ได้ลงข้อมูลทักษะด้านความรู้
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ทักษะด้านอารมณ์ */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Smile className="w-5 h-5 md:w-6 md:h-6" />
+                      <p className="text-sm md:text-base lg:text-xl font-semibold">ทักษะด้านอารมณ์</p>
+                    </div>
+
+                    {ss.length > 0 ? (
+                      ss.map((ss, index) => (
+                        <div key={index} className="ml-6 md:ml-10 text-[10px] md:text-sm lg:text-lg">
+                          {index + 1}. {ss.softskill_name}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="flex items-center gap-2 ml-6 mt-2 text-sm md:text-lg font-medium">
+                        <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                        ยังไม่ได้ลงข้อมูลทักษะด้านอารมณ์
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-              {/* /end flex job/ */}
               
+             </div> 
         </div>
         )}
 
         {queryType === "volunteer" && (
-          <div className="bg-white px-5 py-3 md:px-15 md:py-6 lg:px-25 lg:py-12 xl:px-35 xl:py-14">
+          <div className="bg-white px-5 py-3 md:px-15 md:py-6 lg:px-30 lg:py-12 xl:px-50 xl:py-14">
           
               
-              <div className="py-2 md:py-4 lg:py-6">
-                <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#7B6ADA] ml-2 mb-1 md:ml-4 md:mb-2">กิจกรรมจิตอาสาที่สนใจ</p>
-                  {/* table interest_work */}
+              {/* กิจกรรมจิตอาสาที่สนใจ */}
+              <div className="flex flex-col bg-[#D9D9D9] rounded-3xl p-5 mb-5 md:py-4 lg:py-6" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+                <p className="text-xl md:text-2xl lg:text-3xl font-bold text-[#7B6ADA] ml-2 mb-1 md:ml-4 md:mb-2">กิจกรรมจิตอาสาที่สนใจ</p>
+                {interests_volun.length > 0 ? (
                   <div className="flex flex-col justify-center items-center">
-                    
-                    {/* ประสบการณ์งานแต่ละแถวเริ่มนี่ วนปสกงาน */}
-                      
-                        <div  className="flex flex-col justify-center w-full p-2 lg:p-4 xl:p-6 bg-white text-[#7B6ADA] text-xs font-bold lg:text-2xl xl:text-3xl" >
-                          
-                          <div className="flex items-center justify-center mt-2 md:mt-4 lg:mt-8">
-                            <table>
-                              <tbody>
-                                <tr className="bg-[#7B6ADA] text-white h-8 border-b">
-                                  <th className="w-5 md:w-10 lg:w-10 xl:w-15">ที่</th>
-                                  <th className="w-50 md:w-40 lg:w-50 xl:w-60">ประเภทกิจกรรมจิตอาสา</th>
-                                  <th className="w-30 md:w-80 lg:w-90 xl:w-100">วัน เวลาที่สะดวก</th>
-                                  
-                                  
+                    <div className="flex flex-col justify-center w-full p-2 lg:p-4 xl:p-6 bg-[#D9D9D9] text-[#7B6ADA] text-xs font-bold lg:text-xl">
+                      <div className="flex items-center justify-center w-full">
+                        <div className="overflow-hidden rounded-2xl w-full">
+                          <table className="w-full border-collapse">
+                            <thead>
+                              <tr className="bg-[#7B6ADA] text-white h-10">
+                                <th className="text-center p-2">ที่</th>
+                                <th className="text-center p-2">ประเภทกิจกรรมจิตอาสา</th>
+                                <th className="text-center p-2">วัน เวลาที่สะดวก</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {interests_volun.map((volun, index) => (
+                                <tr key={index + 1} className="bg-white border-b hover:bg-[#f1f0ff]">
+                                  <td className="text-center align-middle p-2 text-[10px] md:text-sm lg:text-lg">{index + 1}</td>
+                                  <td className="text-center align-middle p-2 text-[10px] md:text-sm lg:text-lg">{volun.voluntype_name}</td>
+                                  <td className="text-center align-middle p-2 text-[10px] md:text-sm lg:text-lg">
+                                    {volun.hours} - {volun.end_hour} น.<br />{renderWorkSchedule(volun.days)}
+                                  </td>
                                 </tr>
-                                {interests_volun.map((volun , index) => (
-                                  <tr key={index+1} className="h-15 lg:h-10 xl:h-12 border-b">
-                                    <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{index+1}</a></td>
-                                    <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{volun.voluntype_name}</a></td>
-                                    
-                                    <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{volun.hours}{renderWorkSchedule(volun.days)}</a></td>
-                           
-                                  </tr>
-                                ))}
-                                
-
-                              </tbody>
-                            </table>
-                        
-                      </div>
-                        
-                    </div>
-                  
-                  {/* /end loop for exper/ */}
-              </div>
-              {/* /end flex exper/ */}              </div>
-              
-
-              
-              {/* table job */}
-              <div className="flex flex-col py-2 md:py-4 lg:py-6">
-                <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#7B6ADA] ml-2 mb-2 md:ml-4 md:mb-2">กิจกรรมที่จับคู่แล้ว</p>
-                <div className="flex flex-col justify-center w-full p-2 lg:p-4 xl:p-6 bg-[#D9D9D9] text-[#7B6ADA] text-xs font-bold lg:text-2xl xl:text-3xl border-b" >
-                      ทั้งหมด {volun_matchedCount} งาน
-                </div>
-                {/* งานแต่ละแถวเริ่มนี่ วนงาน */}
-                  {volun_matched.map((post) => (
-                    <div key={post.post_id} className="flex flex-col justify-center w-full p-2 lg:p-4 xl:p-6 bg-white text-[#7B6ADA] text-xs font-bold lg:text-2xl xl:text-3xl border-b" >
-                      <div className="flex justify-between items-center">
-                        <p className="text-xs md:text-xl lg:text-2xl xl:text-3xl font-bold">{post.activity_name ? (post.activity_name) : 'ตำแหน่งงาน'}</p>
-                        <p className="text-[8px] font-bold md:text-sm lg:text-xl xl:text-2xl text-right pt-1">วันที่จับคู่ {post.date_time ? formatDateToThaiShort(post.date_time) : 'ไม่มีวันที่'}</p>
-                      </div>
-                      <div className="flex items-center justify-center mt-2 md:mt-4 lg:mt-8">
-                        <table>
-                          <tbody>
-                            <tr className="lg:h-10 xl:h-12">
-                              <td className="w-5 md:w-10 lg:w-10 xl:w-15"><FaCircle color="#7B6ADA" size={12} /></td>
-                              <td className="w-30 md:w-40 lg:w-50 xl:w-60"><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">ค่าที่คุณสมบัติตรง</a></td>
-                              <td className="w-40 md:w-80 lg:w-90 xl:w-100"><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{post.match} %</a></td>
-                            </tr>
-                            <tr className="lg:h-10 xl:h-12">
-                              <td><FaCircle color="#7B6ADA" size={12} /></td>
-                              <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">ค่าที่คุณสมบัติไม่ตรง</a></td>
-                              <td><a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA]">{post.not_match} %</a></td>
-                            </tr>
-                            
-                          </tbody>
-                        </table>
-                        
-                      </div>
-                        <div className="flex justify-end">
-                          <button 
-                            onClick={() => goToVolunPost(post.post_id)}
-                            className="btn btn-xs md:btn-sm lg:btn-lg xl:btn-xl w-20 md:w-25 lg:w-35 xl:w-45 border border-[#7B6ADA] bg-[#7B6ADA] text-white rounded-xl md:rounded-2xl lg:rounded-3xl xl:rounded-4xl"
-                          >รายละเอียด</button>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
+                      </div>
                     </div>
-                  ))}
-                  {/* /end loop for job/ */}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center text-[#7B6ADA] gap-2 text-sm md:text-lg lg:text-xl font-semibold mt-4">
+                    <AlertTriangle className="w-6 h-6 text-yellow-500" />
+                    ยังไม่ได้ลงข้อมูลกิจกรรมจิตอาสาที่สนใจไว้
+                  </div>
+                )}
               </div>
-              {/* /end flex job/ */}
+
+              {/* กิจกรรมที่จับคู่แล้ว */}
+              <div className="flex flex-col bg-[#D9D9D9] rounded-3xl p-5 mb-5 md:py-4 lg:py-6" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+                <p className="text-xl md:text-2xl lg:text-3xl font-bold text-[#7B6ADA] ml-2 mb-1 md:ml-4 md:mb-2">กิจกรรมที่จับคู่แล้ว</p>
+                <div className="p-2 lg:p-4 xl:p-6 bg-[#D9D9D9] text-[#7B6ADA] text-xs font-bold lg:text-2xl xl:text-3xl">
+                  <table className="w-full table-auto border-separate border-spacing-0 overflow-hidden rounded-3xl shadow-md">
+                    <thead>
+                      <tr>
+                        <th className="bg-[#7B6ADA] text-white text-left p-3 text-xs font-bold lg:text-xl">
+                          ทั้งหมด {volun_matchedCount} งาน
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white">
+                      {volun_matched.map((post) => (
+                        <tr key={post.post_id} className="border-t border-gray-200">
+                          <td className="p-4 text-[#7B6ADA] text-xs font-bold lg:text-xl">
+                            <div className="flex justify-between items-center">
+                              <span className="font-bold">{post.activity_name || 'ตำแหน่งงาน'}</span>
+                              <span className="text-[8px] md:text-sm text-right pt-1">
+                                วันที่จับคู่ {post.date_time ? formatDateToThaiShort(post.date_time) : 'ไม่มีวันที่'}
+                              </span>
+                            </div>
+
+                            <div className="mt-2 w-full">
+                              <p className="text-[10px] md:text-sm text-[#7B6ADA] font-semibold mb-1">ค่าความตรงกับคุณสมบัติ</p>
+                              <div className="w-full bg-[#C0BBEB] rounded-full h-7 relative overflow-hidden">
+                                <div className="bg-[#7B6ADA] h-7 rounded-full" style={{ width: `${post.match}%` }}></div>
+                                <div className="absolute inset-0 flex justify-between items-center px-2 text-[10px] md:text-xs font-bold">
+                                  <span className="text-white">ตรง {post.match}%</span>
+                                  <span className="text-[#7B6ADA]">ไม่ตรง {post.not_match}%</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-end mt-2">
+                              <button
+                                onClick={() => goToVolunPost(post.post_id)}
+                                className="btn btn-sm lg:btn-lg border border-[#7B6ADA] bg-[#7B6ADA] text-white rounded-xl"
+                              >
+                                รายละเอียดกิจกรรม
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
               
         </div>
         )}

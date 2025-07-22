@@ -16,8 +16,8 @@ export default function Menu_xs() {
                     <li><Link to="/Admin/Dashboard" className="text-lg hover:bg-gray-300 hover:text-[#7B6ADA] rounded-full">หน้าหลัก</Link></li>
                     <li><Link to="/Admin/jobber" className="text-lg hover:bg-gray-300 hover:text-[#7B6ADA] rounded-full">ข้อมูลผู้สมัครงานและจิตอาสา</Link></li>
                     <li><Link to="/Admin/emp" className="text-lg hover:bg-gray-300 hover:text-[#7B6ADA] rounded-full">ข้อมูลนายจ้างและผู้จัดกิจกรรม</Link></li>
-                    <li><Link to="/Admin/job" className="text-lg hover:bg-gray-300 hover:text-[#7B6ADA] rounded-full">ข้อมูลงาน</Link></li>
-                    <li><Link to="/Admin/volun" className="text-lg hover:bg-gray-300 hover:text-[#7B6ADA] rounded-full">ข้อมูลกิจกรรมจิตอาสา</Link></li>
+                    <li><Link to="/Admin/jjob" className="text-lg hover:bg-gray-300 hover:text-[#7B6ADA] rounded-full">ข้อมูลงาน</Link></li>
+                    <li><Link to="/Admin/vvolun" className="text-lg hover:bg-gray-300 hover:text-[#7B6ADA] rounded-full">ข้อมูลกิจกรรมจิตอาสา</Link></li>
                     <li><Link to="/Admin/position" className="text-lg hover:bg-gray-300 hover:text-[#7B6ADA] rounded-full">ข้อมูลตำแหน่งงาน</Link></li>
                     <li><Link to="/Admin/jobtype" className="text-lg hover:bg-gray-300 hover:text-[#7B6ADA] rounded-full">ข้อมูลประเภทงาน</Link></li>
                     <li><Link to="/Admin/voluntype" className="text-lg hover:bg-gray-300 hover:text-[#7B6ADA] rounded-full">ข้อมูลประเภทกิจกรรมจิตอาสา</Link></li>

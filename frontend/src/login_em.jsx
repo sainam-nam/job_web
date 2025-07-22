@@ -10,10 +10,11 @@ function Login_em() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
    
     function handleSubmit(event) {
       event.preventDefault();
-      axios.post('http://localhost:8081/login_em', {email, password})
+      axios.post(`${apiUrl}/login_em`, {email, password})
       .then(res => {
         if (res.data.message === "Login successful") {
           const role = res.data.status;
@@ -23,7 +24,7 @@ function Login_em() {
             alert("บัญชีของคุณถูกระงับ");
           }
         } else {
-          alert("อีเมลล์หรือรหัสผ่านของคุณไม่ถูกต้อง");
+          alert("อีเมลหรือรหัสผ่านของคุณไม่ถูกต้อง");
         }
       })
       .catch(err => console.log(err));
@@ -47,7 +48,7 @@ function Login_em() {
               <form onSubmit={handleSubmit}>
                 <div className="flex flex-col items-center">
                   <div className="flex flex-col">
-                    <a className="text-[#7B6ADA] font-bold">อีเมลล์</a>
+                    <a className="text-[#7B6ADA] font-bold">อีเมล</a>
                     <input type="text" className="input w-75 lg:w-120 bg-white text-[#7B6ADA] border-[#A3A3A3] rounded-box mb-2" 
                       onChange={e => setEmail(e.target.value)} />
 

@@ -20,7 +20,7 @@ function Index() {
     const gapClass = maxLength >= 5 ? "gap-6" 
                       : maxLength >= 3 ? "gap-10"
                       : "gap-15";
-    
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
     /*const Star = ({ filled }) => (
       <FaStar color={filled ? '#7B6ADA' : '#e5e7eb'} size={15} style={{ borderRadius: '5px' }} />
@@ -32,7 +32,7 @@ function Index() {
 
 const fetchData = async () => {
   try {
-    const res = await fetch(`http://localhost:8081/apibelogin`);
+    const res = await fetch(`${apiUrl}/apibelogin`);
     const result = await res.json();
 
     if (typeof result === 'object' && 'jobCount' in result && 'volunteerCount' in result && 'jobTypeCount' in result) {
@@ -71,6 +71,7 @@ const fetchData = async () => {
   };
     
     return (
+      <div className="flex min-h-screen">
       <div onClick={handleLogin}>
         <Navbar_Belogin />
         <div className="relative w-full group">
@@ -79,10 +80,10 @@ const fetchData = async () => {
             เริ่มการหางาน
           </button>
         </div>
-        <div className="p-4 md:pl-4 md:pt-4 md:p-0 lg:pl-8 xl:pl-12 bg-white ">
+        <div className="p-4 sm:pl-4 sm:pt-4 sm:p-0 md:pl-4 md:pt-4 md:p-0 lg:pl-8 xl:pl-12 bg-white ">
             <h1 className="text-[#7B6ADA] font-bold mb-6 lg:text-2xl lg:mb-10 xl:mb-15">เว็บเราทำอะไรได้บ้าง ?</h1>
             <div className="md:flex md:justify-center">
-              <div className="flex gap-6 mb-4 md:mr-5 lg:gap-10 lg:mr-9 xl:gap-20 xl:mr-9">
+              <div className="flex justify-center gap-7 mb-4 md:mr-5 lg:gap-10 lg:mr-9 xl:gap-20 xl:mr-9">
                 <div className="indicator">
                     <span className="indicator-item badge bg-[#7B6ADA] border-[#7B6ADA] w-12 h-12 lg:w-20 lg:h-20 xl:w-25 xl:h-25 rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-10">
@@ -117,75 +118,76 @@ const fetchData = async () => {
                     </div>
                 </div>
               </div>
-              <div className="relative w-full group">
-              <div className="flex items-center h-30 w-90 md:h-23 lg:h-35 xl:h-45 md:w-full bg-[#7B6ADA] text-white rounded-bl-full rounded-tl-full pl-14 py-3 md:py-0 md:pl-20 md:pl-23 xl:pl-30">
-                
-                <div className="mr-6 absolute top-1/9 left-1/17">
-                  <div className="rotate-[-20deg] text-xl md:text-sm lg:text-xl xl:text-2xl font-bold opacity-50">จำนวน</div>
-                </div>
+              
+                <div className="relative w-full group flex justify-center">
+                  <div className="flex items-center h-30 w-90 md:h-23 lg:h-35 xl:h-45 md:w-full bg-[#7B6ADA] text-white rounded-bl-full rounded-tl-full pl-14 py-3 md:py-0 md:pl-20 md:pl-23 xl:pl-30">
+                    
+                    <div className="mr-6 absolute top-1/9 left-1/17">
+                      <div className="rotate-[-20deg] text-xl md:text-sm lg:text-xl xl:text-2xl font-bold opacity-50">จำนวน</div>
+                    </div>
 
-                
-                <div className={`flex justify-center items-center ${gapClass} text-center`}>
-                  <div className="xl:mr-8">
-                    <div className="text-3xl lg:text-4xl xl:text-5xl font-bold">{jobCount}</div>
-                    <div className="text-xs lg:text-sm xl:text-md font-bold">งาน</div>
+                    <div className={`flex justify-center items-center ${gapClass} text-center`}>
+                      <div className="xl:mr-8">
+                        <div className="text-3xl lg:text-4xl xl:text-5xl font-bold">{jobCount}</div>
+                        <div className="text-xs lg:text-sm xl:text-md font-bold">งาน</div>
+                      </div>
+                      <div className="xl:mr-8">
+                        <div className="text-3xl lg:text-4xl xl:text-5xl font-bold">{volunteerCount}</div>
+                        <div className="text-xs lg:text-sm xl:text-md font-bold">กิจกรรมจิตอาสา</div>
+                      </div>
+                      <div className="">
+                        <div className="text-3xl lg:text-4xl xl:text-5xl font-bold">{jobTypeCount}</div>
+                        <div className="text-xs lg:text-sm xl:text-md font-bold">ประเภทงาน</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="xl:mr-8">
-                    <div className="text-3xl lg:text-4xl xl:text-5xl font-bold">{volunteerCount}</div>
-                    <div className="text-xs lg:text-sm xl:text-md font-bold">กิจกรรมจิตอาสา</div>
-                  </div>
-                  <div className="">
-                    <div className="text-3xl lg:text-4xl xl:text-5xl font-bold">{jobTypeCount}</div>
-                    <div className="text-xs lg:text-sm xl:text-md font-bold">ประเภทงาน</div>
-                  </div>
-                </div>
               </div>
-            </div>
+
           </div>
         </div>
         <div className="flex flex-col justify-center items-center bg-gradient-to-b from-white to-[#7B6ADA] pb-4 px-5 lg:px-10 lg:pb-8">
           <div>
-            <a className="text-lg text-[#7B6ADA] font-bold">ประเภทงาน</a>
-            <a className="text-sm text-[#7B6ADA] font-bold pl-1 pt-0.5">ยอมนิยม</a>
+            <a className="text-lg lg:text-2xl text-[#7B6ADA] font-bold">ประเภทงาน</a>
+            <a className="text-sm lg:text-lg text-[#7B6ADA] font-bold pl-1 pt-0.5">ยอมนิยม</a>
           </div>
-          <a className="text-xs text-[#7B6ADA] font-bold mb-1">จากทั้งหมด {jobTypeCount} ประเภท</a>
+          <a className="text-xs lg:text-sm text-[#7B6ADA] font-bold mb-1">จากทั้งหมด {jobTypeCount} ประเภท</a>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 my-1">
             {data.map((jobtype) => (
               //const [thai, englishRaw] = jobtype.jobtype_name.split(" (");
               //const english = englishRaw?.replace(")", "");
               <button
                 key={jobtype.jobtype_id}
-                className="btn btn-md text-[10px] bg-white border-[#7B6ADA] border-3 rounded-xl hover:bg-[#7B6ADA] hover:text-white text-[#7B6ADA] py-2 px-4"
+                className="btn btn-md text-[10px] lg:text-xs lg:btn-lg bg-white border-[#7B6ADA] border-3 rounded-xl hover:bg-[#7B6ADA] hover:text-white text-[#7B6ADA] py-2 px-4"
               >
                 <div>{jobtype.jobtype_name}</div>
               </button>
             ))}
             <button
                 
-                className="btn btn-md text-[10px] bg-[#7B6ADA] border-white text-white border-3 rounded-xl hover:bg-white hover:text-[#7B6ADA]  py-2 px-4"
+                className="btn btn-md text-[10px] lg:text-xs lg:btn-lg bg-[#7B6ADA] border-white text-white border-3 rounded-xl hover:bg-white hover:text-[#7B6ADA]  py-2 px-4"
               >
                 ทั้งหมด
               </button>
           </div>
           <div className="mt-4">
-            <a className="text-lg text-white font-bold">ประเภทกิจกรรมจิตอาสา</a>
-            <a className="text-sm text-white font-bold pl-1 pt-0.5">ยอมนิยม</a>
+            <a className="text-lg lg:text-2xl text-white font-bold">ประเภทกิจกรรมจิตอาสา</a>
+            <a className="text-sm lg:text-lg text-white font-bold pl-1 pt-0.5">ยอมนิยม</a>
           </div>
-          <a className="text-xs text-white font-bold mb-1">จากทั้งหมด {volunTypeCount} ประเภท</a>
+          <a className="text-xs lg:text-sm text-white font-bold mb-1">จากทั้งหมด {volunTypeCount} ประเภท</a>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 my-1">
             {data.map((jobtype) => (
               //const [thai, englishRaw] = jobtype.jobtype_name.split(" (");
               //const english = englishRaw?.replace(")", "");
               <button
                 key={jobtype.jobtype_id}
-                className="btn btn-md text-[10px] bg-[#7B6ADA] border-white text-white border-3 rounded-xl hover:bg-[#7B6ADA] hover:text-white  py-2 px-4"
+                className="btn btn-md text-[10px] lg:text-xs lg:btn-lg bg-[#7B6ADA] border-white text-white border-3 rounded-xl hover:bg-[#7B6ADA] hover:text-white  py-2 px-4"
               >
                 <div>{jobtype.jobtype_name}</div>
               </button>
             ))}
             <button
                 
-                className="btn btn-md text-[10px] bg-white border-[#7B6ADA] text-[#7B6ADA] border-3 rounded-xl hover:bg-white hover:text-[#7B6ADA]  py-2 px-4"
+                className="btn btn-md text-[10px] lg:text-xs lg:btn-lg bg-white border-[#7B6ADA] text-[#7B6ADA] border-3 rounded-xl hover:bg-white hover:text-[#7B6ADA]  py-2 px-4"
               >
                 ทั้งหมด
               </button>
@@ -193,7 +195,7 @@ const fetchData = async () => {
         </div>
         <div className="flex flex-col justify-center items-center bg-white p-4">
           
-          <a className="text-lg text-[#7B6ADA] font-bold">ประกาศล่าสุด</a>
+          <a className="text-lg lg:text-2xl text-[#7B6ADA] font-bold">ประกาศล่าสุด</a>
           <div className="relative flex items-center mb-3">
             <button onClick={() => navigate("/job")} className="z-10 btn btn-xs bg-[#7B6ADA] border-[#7B6ADA] rounded-full pt-0.5 px-5 w-30 lg:w-40 hover:w-40 lg:text-sm">งาน</button>
             <button onClick={() => navigate("/volun")} className="z-0 -ml-5 btn btn-xs bg-white text-[#7B6ADA] border-3 pt-0.5 px-5 w-30 lg:w-40 border-[#7B6ADA] rounded-full hover:w-40 lg:text-sm">กิจกรรมจิตอาสา</button>
@@ -239,10 +241,11 @@ const fetchData = async () => {
           </center>
         </div>
         <Footer />
+        </div>
         {/* Modal ให้ไปล็อกอินนน */}
           <dialog id="gologin_modal" className="modal">
             <div className="modal-box  bg-white">
-              <center><h2 className="text-xs md:text-xl text-[#7B6ADA] font-bold mb-4">กรุณาเข้าสู่ระบบก่อนเพื่อเข้าถึงข้อมูล</h2></center>
+              <center><h2 className="text-xl md:text-2xl lg:text-3xl text-[#7B6ADA] font-bold mb-4">กรุณาเข้าสู่ระบบก่อนเพื่อเข้าถึงข้อมูล</h2></center>
                 
               <div className="modal-action flex flex-col justify-center items-center">
                 
@@ -255,6 +258,7 @@ const fetchData = async () => {
               </div>
             </div>
           </dialog>
+      
       </div>
     )
 }

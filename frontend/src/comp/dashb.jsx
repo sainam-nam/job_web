@@ -3,6 +3,7 @@ import React, { useState , useEffect } from "react"
 import PieChartComponent from "./Pie";
 import BarChartComponent from "./bar";
 import BarComponent from "./barnormal";
+import { jwtDecode } from "jwt-decode";
 
 export default function Dashboard() {
   const [labels, setLabels] = useState({labels: [], jobs: [], interested: [], hired: []});
@@ -22,6 +23,25 @@ export default function Dashboard() {
   const jobtnum = String(jobTypeCount).length;
   const textjobt = jobtnum >= 5 ? "text-lg md:text-xl lg:text-2xl" : jobtnum >= 3 ? "text-xl md:text-4xl lg:text-5xl" : "text-4xl md:text-5xl lg:text-6xl";
   const navigate = useNavigate();
+  const [userId, setUserId] = useState(null);
+  
+  useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        // ถ้าไม่มี token อาจ redirect ไป login
+  
+        window.location.href = "/login";
+        return;
+      }
+      try {
+        const decoded = jwtDecode(token);
+        setUserId(decoded.jobber_id); // ✅ สมมุติว่า backend ใส่ user_id มาใน token
+      } catch (error) {
+        console.error("Invalid token", error);
+        window.location.href = "/login";
+      }
+      
+    }, []);
 
   useEffect(() => {
           fetchData();
@@ -29,7 +49,9 @@ export default function Dashboard() {
 
   const fetchData = async () => {
   try {
-    const res = await fetch(`http://localhost:8081/apidash_job`);
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+    const res = await fetch(`${apiUrl}/apidash_job`);
     const result = await res.json();
 
     if (typeof result === 'object' &&
