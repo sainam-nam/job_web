@@ -223,28 +223,28 @@ const InfoForm = () => {
 
   return (
     <div>
-        <div className='text-[#7B6ADA] bg-white rounded-3xl p-5' style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+        <div className='text-[#8E80FF] bg-white rounded-3xl p-5' style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
             <a className='font-bold text-xl'>ข้อมูลส่วนตัว</a>
                 <form onSubmit={handleSubmit} className='mt-2 '>
                     <div className="flex flex-col gap-2 items-center justify-center ">
                         <div className="flex flex-col gap-1 text-sm w-2/3">
-                            <a className="text-[#7B6ADA] font-bold">อีเมล : {formData.email}</a>
+                            <a className="text-[#8E80FF] font-bold">อีเมล : {formData.email}</a>
                             <div className="flex gap-2">
                                 <div className="flex flex-col w-full">
-                                    <a className="text-[#7B6ADA] font-bold">ชื่อ</a>
+                                    <a className="text-[#8E80FF] font-bold">ชื่อ</a>
                                         <input 
                                             type="text" 
-                                            className="input w-full bg-white text-[#7B6ADA] border-[#A3A3A3] rounded-box" 
+                                            className="input w-full bg-white text-[#8E80FF] border-[#A3A3A3] rounded-box" 
                                              name="firstname"
                                             value={formData.firstname || ""}
                                             onChange={handleChange} 
                                             required/>
                                 </div>
                                 <div className="flex flex-col w-full">
-                                    <a className="text-[#7B6ADA] font-bold">นามสกุล</a>
+                                    <a className="text-[#8E80FF] font-bold">นามสกุล</a>
                                         <input 
                                         type="text" 
-                                        className="input w-full bg-white text-[#7B6ADA] border-[#A3A3A3] rounded-box" 
+                                        className="input w-full bg-white text-[#8E80FF] border-[#A3A3A3] rounded-box" 
                                         name="lastname"
                                         value={formData.lastname || ""}
                                         onChange={handleChange} 
@@ -253,20 +253,20 @@ const InfoForm = () => {
                             </div>
                             <div className="flex gap-2 mt-2">
                                 <div className="flex flex-col w-full">
-                                    <div className="text-[#7B6ADA] font-bold">ชื่อ <a className="text-[10px]">ภาษาอังกฤษ</a></div>
+                                    <div className="text-[#8E80FF] font-bold">ชื่อ <a className="text-[10px]">ภาษาอังกฤษ</a></div>
                                         <input 
                                             type="text" 
-                                            className="input w-full bg-white text-[#7B6ADA] border-[#A3A3A3] rounded-box" 
+                                            className="input w-full bg-white text-[#8E80FF] border-[#A3A3A3] rounded-box" 
                                             name="firstname_eng"
                                             value={formData.firstname_eng || ""}
                                             onChange={handleChange} 
                                             required/>
                                 </div>
                                 <div className="flex flex-col w-full">
-                                    <div className="text-[#7B6ADA] font-bold">นามสกุล <a className="text-[10px]">ภาษาอังกฤษ</a></div>
+                                    <div className="text-[#8E80FF] font-bold">นามสกุล <a className="text-[10px]">ภาษาอังกฤษ</a></div>
                                         <input 
                                             type="text" 
-                                            className="input w-full bg-white text-[#7B6ADA] border-[#A3A3A3] rounded-box" 
+                                            className="input w-full bg-white text-[#8E80FF] border-[#A3A3A3] rounded-box" 
                                             name="lastname_eng"
                                             value={formData.lastname_eng || ""}
                                             onChange={handleChange} 
@@ -274,7 +274,7 @@ const InfoForm = () => {
                                 </div>
                             </div>
                             <div className="flex justify-between  mt-2">
-                                <a className="text-[#7B6ADA] font-bold">เพศ</a>
+                                <a className="text-[#8E80FF] font-bold">เพศ</a>
                             </div>
                             <div className='flex justify-between gap-1'>
                                 <div className='flex items-center gap-1'>
@@ -318,24 +318,24 @@ const InfoForm = () => {
                                 </div> 
                                                     
                             </div>
-                            <label className="label pt-1">
+                            {/* <label className="label pt-1">
                                 <input 
                                     type="checkbox" 
                                     name="LG" 
-                                    className="checkbox checkbox-sm border-[#7B6ADA] checked:text-[#7B6ADA]" 
+                                    className="checkbox checkbox-sm border-[#8E80FF] checked:text-[#8E80FF]" 
                                     checked={formData.LG} 
                                     onChange={(e) => setFormData({ ...formData, LG: e.target.checked })}
                                 />
                                 <a className='text-xs'>ฉันเป็นส่วนหนึ่งของชุมชน LGBTQIA+ (ไม่บังคับเลือก)</a>
-                            </label>
+                            </label> */}
                             <div className="flex justify-between  mt-2">
-                                <a className="text-[#7B6ADA] font-bold">วันเกิด</a>
+                                <a className="text-[#8E80FF] font-bold">วันเกิด</a>
                             </div>
                                                 
                             <input 
                                 //type={showCPassword ? "text" : "password"} 
                                 type='date'
-                                className="input w-full bg-white text-[#7B6ADA] border border-[#A3A3A3] rounded-box" 
+                                className="input w-full bg-white text-[#8E80FF] border border-[#A3A3A3] rounded-box" 
                                 name="birthday"
                                 value={formData.birthday || ""}
                                 //value={form.confirmPassword}
@@ -344,11 +344,11 @@ const InfoForm = () => {
                             />
 
                             <div className="flex justify-between pt-2">
-                                <a className="text-[#7B6ADA] font-bold">ที่อยู่ปัจจุบัน</a>
+                                <a className="text-[#8E80FF] font-bold">ที่อยู่ปัจจุบัน</a>
                             </div>
                             {/* จังหวัด */}
                                 <select
-                                    className="select w-full bg-white border border-[#A3A3A3] text-[#7B6ADA] rounded-box"
+                                    className="select w-full bg-white border border-[#A3A3A3] text-[#8E80FF] rounded-box"
                                     value={selectedJangwat}
                                     onChange={(e) => setSelectedJangwat(e.target.value)}
                                 >
@@ -363,7 +363,7 @@ const InfoForm = () => {
                                 <div className="flex flex-col w-full">
                                     {/* อำเภอ */}
                                         <select
-                                            className="select w-full bg-white border border-[#A3A3A3] text-[#7B6ADA] rounded-box"
+                                            className="select w-full bg-white border border-[#A3A3A3] text-[#8E80FF] rounded-box"
                                             value={selectedAmpher}
                                             onChange={(e) => setSelectedAmpher(e.target.value)}
                                             
@@ -379,7 +379,7 @@ const InfoForm = () => {
                                 <div className="flex flex-col w-full">
                                     {/* ตำบล */}
                                     <select
-                                        className="select w-full bg-white border border-[#A3A3A3] text-[#7B6ADA] rounded-box"
+                                        className="select w-full bg-white border border-[#A3A3A3] text-[#8E80FF] rounded-box"
                                         value={selectedTambon}
                                         onChange={(e) => setSelectedTambon(e.target.value)}
                                         //disabled={!selectedAmpher}
@@ -396,17 +396,17 @@ const InfoForm = () => {
                             <input 
                                 //type={showCPassword ? "text" : "password"} 
                                 type='text'
-                                className="input w-full bg-white text-[#7B6ADA] border border-[#A3A3A3] rounded-box" 
+                                className="input w-full bg-white text-[#8E80FF] border border-[#A3A3A3] rounded-box" 
                                 name="address"
                                 placeholder='ที่อยู่ อาคาร หมู่บ้าน'
                                 value={formData.address || ""}
                                 onChange={handleChange}
                                 required
                             />
-                            <a className="text-[#7B6ADA] font-bold mt-2">เบอร์โทรศัพท์</a>
+                            <a className="text-[#8E80FF] font-bold mt-2">เบอร์โทรศัพท์</a>
                                 <input 
                                     type="text" 
-                                    className="input w-full bg-white text-[#7B6ADA] border border-[#A3A3A3] rounded-box" 
+                                    className="input w-full bg-white text-[#8E80FF] border border-[#A3A3A3] rounded-box" 
                                     name="phone"
                                     value={formData.phone || ""}
                                     onChange={handleChange} 
@@ -415,7 +415,7 @@ const InfoForm = () => {
                         <div className="flex w-full p-4 justify-center">
                             <hr className="w-1/2 border border-[#D9D9D9]" />
                         </div> 
-                        <button className="btn bg-[#7B6ADA] border-[#7B6ADA] rounded-xl mb-2 hover:border-5">บันทึก</button>
+                        <button className="btn bg-[#8E80FF] border-[#8E80FF] rounded-xl mb-2 hover:border-5">บันทึก</button>
                     </div>
                 </form>
         </div>
@@ -423,15 +423,15 @@ const InfoForm = () => {
         <dialog id="save_modal" className="modal">
           <div className="modal-box bg-white">
             <center>
-                <p className="text-4xl  text-[#7B6ADA]">บันทึกข้อมูลสำเร็จ</p>
-                <p className=" text-[#7B6ADA]">คุณได้บันทึกข้อมูลส่วนตัวเรียบร้อย </p>
+                <p className="text-4xl  text-[#8E80FF]">บันทึกข้อมูลสำเร็จ</p>
+                <p className=" text-[#8E80FF]">คุณได้บันทึกข้อมูลส่วนตัวเรียบร้อย </p>
               <div className="w-30 h-30 flex items-center justify-center my-6">
                 <img src="/check.png" className="rounded-full"></img>
               </div>
             </center>   
             <div className="modal-action flex justify-center">
               
-                <button className="btn bg-[#7B6ADA] border border-[#7B6ADA] text-white px-4 py-2 rounded-lg" onClick={() => {navigate("/profile/info/view"); window.scrollTo(0, 0);}}>
+                <button className="btn bg-[#8E80FF] border border-[#8E80FF] text-white px-4 py-2 rounded-lg" onClick={() => {navigate("/profile/info/view"); window.scrollTo(0, 0);}}>
                   ตกลง
                 </button>
               

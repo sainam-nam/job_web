@@ -68,10 +68,10 @@ const InfoView = () => {
 
   return (
     <div>
-       <div className='text-[#7B6ADA] bg-white rounded-3xl p-6 relative' style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+       <div className='text-[#8E80FF] bg-white rounded-3xl p-6 relative' style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
             <div className="flex gap-4 items-center mb-4">
                 <h2 className="font-bold text-xl">ข้อมูลส่วนตัว</h2>
-                <button onClick={() => navigate("/profile/info/edit")} className="bg-[#7B6ADA] text-white px-3 py-1 rounded-xl text-sm">
+                <button onClick={() => navigate("/profile/info/add")} className="bg-[#8E80FF] text-white px-3 py-1 rounded-xl text-sm">
                     แก้ไข
                 </button>
             </div>
@@ -123,8 +123,13 @@ const InfoView = () => {
 
                 </div>
             </div>
-            <div className="absolute top-0 right-0 opacity-10 text-[10rem] pr-4 pt-2 pointer-events-none select-none">
-                <img src="/man.png" className='w-100' />
+            <div className="absolute -top-10 right-1/10 opacity-10 text-[10rem] pr-4 pt-2 pointer-events-none select-none">
+                {data[0]?.gender === "M"
+                                    ? <img src='/man.png' className='w-100' />
+                                    : data[0]?.gender === "F"
+                                    ? <img src='/woman.png' className='w-80 rotate-50' />
+                                    : data[0]?.gender || "ไม่ระบุ"}
+                
             </div>
             </div>
             

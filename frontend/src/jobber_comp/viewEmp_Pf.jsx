@@ -1,0 +1,903 @@
+import { useLocation } from "react-router-dom";
+import React, { useState , useEffect, useRef } from "react"
+import Navbar from "./navbar";
+import Footer from "./footer";
+import EmpRating from "./emp_star";
+import EmpRating_one from "./emp_star_one";
+import EmpRating_volun from "./emp_star_volun";
+import { FaCircle } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { HiChevronLeft } from "react-icons/hi";
+import { CheckIcon } from '@heroicons/react/24/outline'
+import axios from "axios";
+import { MapView } from "../comp/map_view";
+import { ArrowLeft } from "lucide-react";
+import { MdOutlineSearch, MdWorkOff } from "react-icons/md";
+import JobCard from "./job_card";
+
+const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+function ViewEmp_Pf() {
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // ถ้าไม่มี token อาจ redirect ไป login
+
+      window.location.href = "/login";
+      return;
+    }
+
+    axios.get(`${apiUrl}/jobber_profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+      setUserData(res.data.user);
+    })
+    .catch(err => {
+      console.error(err);
+      // token หมดอายุหรือไม่ถูกต้อง -> กลับหน้า login
+      alert("เกิดข้อผิดพลาด กรุณาเข้าสู่ระบบอีกครั้ง");
+      window.location.href = "/login";
+    });
+  }, []);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const fromStack = location.state?.fromStack || [];
+  const queryParams = new URLSearchParams(location.search);
+  const id = queryParams.get("emp_id");
+
+  const [emp, setEmp] = useState([]);
+  const [post, setPost] = useState([]);
+  const [jobber_review, setJobberReview] = useState([]);
+  const [jobber_reviewCount, setJobberReviewCount] = useState([]);
+  const [postCount, setPostCount] = useState(1);
+  const [findvolun, setFinedVolun] = useState([]);
+  const [volun_post, setVolunPost] = useState([]);
+  const [volun_review, setVolunReview] = useState([]);
+  const [volun_reviewCount, setVolunReviewCount] = useState([]);
+  const [volunCount, setVolunCount] = useState(1);
+  const [volun_pic, setVolun_pic] = useState([]);
+  const [job_pic, setJob_pic] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalJ, setTotalJ] = useState();
+  const [totalV, setTotalV] = useState();
+  const [search, setSearch ] = useState("");
+  const [limit, setLimit] = useState(3);
+  const [reviewPage, setReviewPage] = useState(1);
+  const [totalJR, setTotalJR] = useState();
+  const [totalVR, setTotalVR] = useState();
+  const [status, setStatus] = useState("ON");
+
+  useEffect(() => {
+          fetchData();
+        }, [id , page , limit , search , status , reviewPage]);
+      
+  // useEffect(() => {
+  //   console.log("Post state:", post);
+  // }, [post]);
+
+  
+  const fetchData = async () => {
+    try {
+      console.log("status=", status);
+      const res = await fetch(`${apiUrl}/emp_pf?emp_id=${id}&reviewPage=${reviewPage}&page=${page}&limit=${limit}&keyword=${search}&status=${status}`);
+      const result = await res.json();
+      //console.log(result);
+      if (typeof result === 'object' && 
+        'postCount' in result && 
+        'volunCount' in result && 
+        'totalPagesJ' in result && 
+        'totalPagesV' in result  &&  
+        'jReviewCount' in result && 
+        'vReviewCount' in result && 
+        'totalReviewPageV' in result && 
+        'totalReviewPageV' in result  ) {
+        setPostCount(result.postCount ?? 0);
+        setVolunCount(result.volunCount ?? 0);
+        setTotalJ(result.totalPagesJ ?? 0);
+        setTotalV(result.totalPagesV ?? 0);
+        setJobberReviewCount(result.jReviewCount ?? 0);
+        setVolunReviewCount(result.vReviewCount ?? 0);
+        setTotalJR(result.totalReviewPageJ ?? 0);
+        setTotalVR(result.totalReviewPageV ?? 0);
+      } else {
+        console.error('รูปแบบข้อมูลไม่ถูกต้อง:', result);
+      }
+
+      if(Array.isArray(result.Emp_pf)){
+          //console.log("sql", res)
+          setEmp(result.Emp_pf);
+        } else {
+          console.error("Data format error:", result);
+          setEmp([]);
+        }
+
+      if(Array.isArray(result.job_post)){
+          //console.log("sql", res)
+          setPost(result.job_post);
+          console.log("Post state11:", result.job_post);
+        } else {
+          console.error("Data format error:", result);
+          setPost([]);
+        }
+      
+
+      if(Array.isArray(result.jobber_review)){
+          //console.log("sql", res)
+          setJobberReview(result.jobber_review);
+        } else {
+          console.error("Data format error:", result);
+          setJobberReview([]);
+        }
+      if(Array.isArray(result.findvolun)){
+          //console.log("sql", res)
+          setFinedVolun(result.findvolun);
+        } else {
+          console.error("Data format error:", result);
+          setFinedVolun([]);
+        }
+
+      if(Array.isArray(result.volun_post)){
+          //console.log("sql", res)
+          setVolunPost(result.volun_post);
+        } else {
+          console.error("Data format error:", result);
+          setVolunPost([]);
+        }
+      
+
+      if(Array.isArray(result.volun_review)){
+          //console.log("sql", res)
+          setVolunReview(result.volun_review);
+        } else {
+          console.error("Data format error:", result);
+          setVolunReview([]);
+        }
+      
+      if(Array.isArray(result.job_pic)){
+          //console.log("sql", result.job_pic)
+          setJob_pic(result.job_pic);
+        } else {
+          console.error("Data format error:", result);
+          setJob_pic([]);
+        }
+
+      if(Array.isArray(result.volun_pic)){
+          //console.log("sql", res)
+          setVolun_pic(result.volun_pic);
+        } else {
+          console.error("Data format error:", result);
+          setVolun_pic([]);
+        }
+  
+    } catch (err) {
+      console.error('Fetch error:', err);
+    }
+  };
+  function formatDateToThaiShort(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // เดือน 0-11 ต้อง +1
+    const year = date.getFullYear() + 543; // เพิ่ม 543 เพื่อเป็นปี พ.ศ.
+
+    return `${day}/${month}/${year}`;
+  }
+  
+  const handleTabClick = (type) => {
+    navigate(`/viewEmp_Pf?emp_id=${id}&type=${type}`, {
+    state: {
+      fromStack: [...(location.state?.fromStack || []), location.pathname + location.search],
+    }
+  });
+    window.scrollTo(0,0);
+  };
+  const queryType = queryParams.get("type") || "job"; // default เป็น "job"
+
+
+  const goToProfile = (val) => {
+    navigate(`/Job_Post_de?pi=${val}`, {
+  state: {
+    fromStack: [...(location.state?.fromStack || []), location.pathname + location.search],
+  }
+});
+    window.scrollTo(0,0);
+  };
+  const goToVolunDetails = (val) => {
+    navigate(`/Volun_Post_de?pi=${val}`, {
+  state: {
+    fromStack: [...(location.state?.fromStack || []), location.pathname + location.search],
+  }
+});
+    window.scrollTo(0,0);
+  };
+
+  const section2Ref = useRef(null);
+
+  const scrollToSection2 = () => {
+    section2Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+    return (
+      <div>
+        {userData && <Navbar user={userData} />}
+        <div className="bg-[#8E80FF] pl-2 md:pl-4 lg:pl-6 xl:pl-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="btn btn-xs md:btn-sm lg:btn-lg xl:btn-xl border-white p-2 md:p-3 lg:p-4 xl:p-5  bg-white text-[#8E80FF] rounded-xl md:rounded-2xl lg:rounded-3xl xl:rounded-4xl"
+          >
+            <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="6">
+              <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+        {/* <center><h1>Job post {id}</h1></center> */}
+        <div className="flex flex-col md:flex-row items-center justify-center gap-2  px-7 pb-5 md:px-20 md:pb-7 lg:px-30 lg:pb-14 xl:px-50 xl:pb-10"> 
+          
+          <div className="avatar">
+            <div className="w-24 sm:w-28 md:w-35 lg:w-55 rounded-full">
+              {emp[0]?.picture ? (
+                            <img src={`/uploads/emp_pic/${emp[0]?.picture}`} />
+                          ) : (
+                            <img src={`/uploads/nophoto.png`}  />
+                          )}
+            </div>
+          </div>
+          <div className="w-full pl-2 md:pl-4 lg:pl-6 xl:pl-10">
+            <div className="flex flex-col gap-1 lg:gap-2 xl:gap-3">
+              <div className="flex gap-1 lg:gap-2 xl:gap-3">
+                <a className="text-md md:text-xl lg:text-3xl xl:text-5xl font-bold">{emp[0]?.fullname}</a>
+                  {emp[0]?.status === "ON" ? (
+                          <button className="text-success w-5 h-5 md:w-7 md:h-7 lg:w-9 lg:h-9 xl:w-11 xl:h-11">
+                            <CheckIcon strokeWidth={6} />
+                          </button>
+                      ) : (
+                          <button className="text-error w-5 h-5 md:w-7 md:h-7 lg:w-9 lg:h-9 xl:w-11 xl:h-11">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={5} stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                      )
+                      }
+                </div>
+              <a className="text-xs md:text-sm lg:text-xl xl:text-2xl font-bold">ต.{emp[0]?.tb} อ.{emp[0]?.ap} จ.{emp[0]?.jw}</a>
+              <a className="text-xs md:text-sm lg:text-xl xl:text-2xl font-bold pt-2">
+                เพศ {emp[0]?.gender === "M"
+                      ? "ชาย"
+                      : emp[0]?.gender === "F"
+                      ? "หญิง"
+                      : emp[0]?.gender || "ไม่ระบุ"}
+                      
+              </a>
+              <div className="w-full mt-2">
+                <p className="text-xs md:text-sm lg:text-xl xl:text-2xl font-bold text-white mb-1">
+                  ค่าการจับคู่ที่ผู้ใช้เลือกไว้
+                </p>
+                <div className="w-full bg-gray-200 rounded-full h-4 md:h-5 lg:h-6 xl:h-8 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-green-300 to-green-500 h-full rounded-full text-right px-2 py-1 text-[10px] md:text-xs lg:text-base font-bold text-white"
+                    style={{ width: `${emp[0]?.pc_match || 0}%` }}
+                  >
+                    {emp[0]?.pc_match || 0}%
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            {queryType === "job" ? (              
+              <div className="flex justify-end gap-2 mt-2 md:mt-5">
+                  <button 
+onClick={scrollToSection2}  
+                  className="btn btn-xs md:btn-sm lg:btn-lg xl:btn-xl w-20 md:w-20 lg:w-30 xl:w-40 border border-white bg-white text-[#8E80FF] rounded-xl md:rounded-2xl lg:rounded-3xl xl:rounded-4xl"
+                  >แผนที่</button>
+                  
+              </div>
+            ) : (
+              <div className="flex justify-end gap-2 mt-2 md:mt-5">
+                  <button 
+                    onClick={() => document.getElementById("section2").scrollIntoView({ behavior: "smooth" })} 
+                    className="opacity-0 btn btn-xs md:btn-sm lg:btn-lg xl:btn-xl w-20 md:w-20 lg:w-30 xl:w-40 border border-white bg-white text-[#8E80FF] rounded-xl md:rounded-2xl lg:rounded-3xl xl:rounded-4xl"
+                  ></button>
+                  
+              </div>
+            )}
+          </div>  
+        </div>
+
+        <div className="relative flex items-center justify-center bg-white p-3">
+          <button onClick={() => handleTabClick("job")} 
+            className={`z-10 btn btn-xs md:btn-md lg:btn-lg transition-all duration-200 border-[#8E80FF] border-3 rounded-full pt-0.5 px-5 w-25 md:w-35 lg:w-50 hover:w-65 hover:h-13 hover:z-20 lg:text-sm
+              ${queryType  === "job" 
+                ? "bg-[#8E80FF] text-white shadow-md" 
+                : "bg-white text-[#8E80FF] hover:bg-[#f5f3ff]"} z-10`}>
+              งาน
+          </button>
+          <button onClick={() => handleTabClick("volunteer")} 
+            className={`-ml-10 pl-5 btn btn-xs md:btn-md lg:btn-lg transition-all duration-200 border-3 pt-0.5 px-5 w-25 md:w-35 lg:w-50 border-[#8E80FF] rounded-full hover:w-65 hover:h-13 hover:z-10 lg:text-sm
+              ${queryType  === "volunteer" 
+                ? "bg-[#8E80FF] text-white shadow-md z-10" 
+                : "bg-white text-[#8E80FF] hover:bg-[#f5f3ff]"} z-0 `}>
+              กิจกรรมจิตอาสา
+          </button>
+        </div>
+        {queryType === "job" && (
+          <div className="bg-white px-5 py-3 md:px-15 md:py-6 lg:px-25 lg:py-12 xl:px-35 xl:py-14">
+          
+                  {emp[0]?.about && (
+                    <div className="py-2 md:py-4 lg:py-6">
+                      <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#8E80FF] ml-2 mb-1 md:ml-4 md:mb-2">เกี่ยวกับ</p>
+                      <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF] ml-4 md:ml-10">
+
+                          <div
+                            className="prose prose-sm md:prose lg:prose-lg"
+                            dangerouslySetInnerHTML={{ __html: emp[0].about }}
+                          ></div>
+                          </div>
+                    </div>
+                  )}
+
+                
+              {/* image */}
+              {job_pic && job_pic.length > 0 && (
+                <div className="flex justify-center mt-4">
+                  {job_pic.length === 1 && (
+                    <img
+                      src={`/uploads/${job_pic}`}
+                      alt="job"
+                      className="w-full max-w-md h-auto rounded-2xl object-cover"
+                    />
+                  )}
+
+                  {(job_pic.length === 2 || job_pic.length === 3) && (
+                    <div className={`grid gap-2 grid-cols-${job_pic.length}`}>
+                      {job_pic.map((pic, index) => (
+                        <img
+                          key={index}
+                          src={`/uploads/${pic}`}
+                          alt={`job-${index}`}
+                          className="w-full h-48 md:h-56 lg:h-64 xl:h-72 rounded-2xl object-cover"
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {job_pic.length === 4 && (
+                    <div className="grid grid-cols-2 gap-2">
+                      {job_pic.map((pic, index) => (
+                        <img
+                          key={index}
+                          src={`/uploads/${pic}`}
+                          alt={`job-${index}`}
+                          className="w-full h-44 md:h-52 lg:h-60 xl:h-64 rounded-2xl object-cover"
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {job_pic.length >= 5 && (
+                    <div className="flex flex-col lg:flex-row gap-2 w-full max-w-6xl">
+                      <img
+                        src={`/uploads/${job_pic[0]}`}
+                        alt="main"
+                        className="w-full lg:w-1/2 h-72 md:h-80 xl:h-96 rounded-2xl object-cover"
+                      />
+                      <div className="grid grid-cols-2 gap-2 w-full lg:w-1/2">
+                        {job_pic.slice(1, 5).map((pic, index) => (
+                          <img
+                            key={index}
+                            src={`/uploads/${pic}`}
+                            alt={`job-sub-${index}`}
+                            className="w-full h-32 md:h-36 lg:h-40 xl:h-44 rounded-2xl object-cover"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+
+                  {emp[0]?.benefits && (
+                    <div className="py-2 md:py-4 lg:py-6">
+                      <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#8E80FF] ml-2 mb-1 md:ml-4 md:mb-2">สวัสดิการพื้นฐาน</p>
+                      <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF] ml-4 md:ml-10">
+
+                        <div
+                          className="prose prose-sm md:prose lg:prose-lg"
+                          dangerouslySetInnerHTML={{ __html: emp[0].benefits }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+                
+              
+              <div className="flex flex-col items-center bg-gray-100 rounded-3xl p-12 mb-12" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+                <p className="text-xl md:text-2xl lg:text-3xl font-bold text-[#8E80FF] ml-2 mb-1 md:ml-4 md:mb-2">
+                  {status === "ON" ? (
+                    <>งานที่เปิดรับสมัครอยู่ [ {postCount ? (postCount):("0")} ]</>
+                  ) : (
+                    <>งานที่จบไปแล้ว [ {postCount ? (postCount):("0")} ]</>
+                  )}
+                </p>
+                
+                <div className="tabs tabs-lift w-full">
+                  <button 
+                    className={`tab [--tab-bg:white] [--tab-border-color:white] text-[#8E80FF] ${status === "ON" ? "tab-active !rounded-t-xl" : "!text-gray-700 bg-gray-300 !rounded-t-xl"}`}
+                    onClick={() => {
+                      setStatus("ON");
+                      setPage(1);
+                    }}
+                  >
+                  เปิดรับสมัครอยู่
+                  </button>
+                  <button 
+                    className={`tab [--tab-bg:white] [--tab-border-color:white] text-[#8E80FF]  ${status === "finish" ? "tab-active !rounded-t-xl" : "!text-gray-700 bg-gray-300 !rounded-t-xl"}`}
+                    onClick={() => {
+                      setStatus("finish");
+                      setPage(1);
+                    }}
+                  >
+                  จบไปแล้ว
+                  </button>
+                  </div>
+                  <div className="bg-white border-white text-[#8E80FF] w-full pt-6 px-6 rounded-b-3xl rounded-tr-3xl shadow-xl">
+                    <div className="mb-5">
+                      {post.length > 0 ? (
+                        <div className="flex flex-col items-center">
+                          
+                            <label className="input w-50 md:w-70 h-7 lg:h-9 bg-white mb-5 rounded-lg border border-[#8E80FF]">
+                              <button>
+                                <MdOutlineSearch className="fill-[#8E80FF] mt-0 md:size-5" />
+                              </button>
+                              <input 
+                                type="search" 
+                                className="text-[#8E80FF] text-xs md:text-sm lg:text-lg" 
+                                placeholder="ชื่อตำแหน่งงาน" 
+                                value={search}
+                                onChange={(e) => {
+                                  setSearch(e.target.value);
+                                  setPage(1);
+                                }}
+                              /> 
+                            </label>
+                          
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-10">
+                              {post.map((post) => (
+                                <JobCard key={post.post_id} post={post} />
+                              ))}
+                            </div>
+                        </div>
+                      ) : (
+                        
+                        status === 'finish' ? (
+                          
+                          
+                            <div className="flex flex-col items-center w-full justify-center text-center text-[#8E80FF]">
+                              <MdWorkOff className="text-7xl mb-6" />
+                                <h2 className="text-xl font-semibold">
+                                  ยังไม่มีงานที่จบไป
+                                </h2>
+                            </div>
+                          
+                        ) : (
+
+                          <div className="flex flex-col items-center w-full justify-center py-7 text-center text-[#8E80FF]">
+                          <MdWorkOff className="text-7xl mb-6" />
+                            <h2 className="text-xl font-semibold mb-2">
+                              ยังไม่มีงานในหมวดนี้
+                            </h2>
+                            <p className="text-sm text-gray-500">
+                              คุณสามารถไปเลือกชมงานได้จากหน้าหลัก
+                            </p>
+                            <a
+                              href="/User/alljob"
+                              className="mt-4 px-5 py-2 bg-[#8E80FF] text-white rounded-full hover:bg-[#695bd6] transition"
+                            >
+                              ไปที่หน้าหลัก
+                            </a>
+                        </div>
+
+                        )
+                      )}
+                    
+                    <center>
+                      <div className="join items-center gap-2 mt-8">
+                        {page > 1 && (
+                          <button onClick={() => setPage(page - 1)}>
+                            <img
+                              src="/up.png"
+                              className="-rotate-90 w-4 h-4 md:w-6 md:h-6 "
+                            />
+                          </button>
+                        )}
+                        {postCount > 0 && (
+                          <button className="btn btn-xs  bg-[#8E80FF] border-[#8E80FF] rounded-3xl join-item btn">
+                            {page}/{totalJ}
+                          </button>
+                        )}
+                        {page < totalJ && (
+                          <button onClick={() => setPage(page + 1)}>
+                            <img
+                              src="/down.png"
+                              className="-rotate-90 w-4 h-4 md:w-6 md:h-6 "
+                            />
+                          </button>
+                        )}
+                      </div>
+                    </center>
+                  </div>
+                </div>
+
+                
+              </div>
+
+
+            {jobber_review.length > 0 && (
+              <div className="flex flex-col bg-white rounded-3xl px-12 py-6 my-5 shadow-md" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }} >
+                <p className="text-xl text-center md:text-2xl lg:text-3xl font-bold text-[#8E80FF] mb-4">
+                  รีวิวจากผู้ที่ทำงาน
+                </p>
+
+                
+                <div className="flex flex-col items-center justify-center mb-6">
+                  {/* <span className="text-sm md:text-xl text-[#8E80FF] font-bold">คะแนนเฉลี่ย</span> */}
+                  <EmpRating emp_id={id} cl="#eebf03ff" />
+                </div>
+
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+                  {jobber_review.map((re, index) => (
+                    <div key={index} className="bg-gray-200 rounded-2xl shadow-lg p-4 flex flex-col justify-between h-full">
+                      <div className="flex gap-3 items-start">
+                        
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <p className="font-bold text-sm md:text-base lg:text-xl text-[#8E80FF]">{re.fullname}</p>
+                            <p className="text-[10px] md:text-sm text-gray-500">{re.date ? formatDateToThaiShort(re.date) : 'ไม่มีวันที่'}</p>
+                          </div>
+                          <p className="text-xs md:text-sm text-gray-600 mt-1">{re.message}</p>
+                        </div>
+                      </div>
+
+                      {/* คะแนนเฉพาะรายการ */}
+                      <div className="flex justify-end mt-4">
+                        <EmpRating_one score={re.score} cl="#8E80FF" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <center>
+                        <div className="join items-center gap-2 mt-8">
+                          {reviewPage > 1 && (
+                            <button onClick={() => setReviewPage(reviewPage - 1)}>
+                              <img
+                                src="/up.png"
+                                className="-rotate-90 w-4 h-4 md:w-6 md:h-6 "
+                              />
+                            </button>
+                          )}
+                          {jobber_reviewCount > 0 && (
+                            <button className="btn btn-xs  bg-[#8E80FF] border-[#8E80FF] rounded-3xl join-item btn">
+                              {reviewPage}/{totalJR}
+                            </button>
+                          )}
+                          {reviewPage < totalJR && (
+                            <button onClick={() => setReviewPage(reviewPage + 1)}>
+                              <img
+                                src="/down.png"
+                                className="-rotate-90 w-4 h-4 md:w-6 md:h-6 "
+                              />
+                            </button>
+                          )}
+                        </div>
+                      </center>
+              </div>
+            )}
+              
+
+              {/* /end review/ */}
+
+              <div className="py-2 md:py-4 lg:py-6">
+                <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#8E80FF] ml-2 mb-1 md:ml-4 md:mb-2">ติดต่อ</p>
+                <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF] ml-4 md:ml-10">{emp[0]?.address} ต.{emp[0]?.tb} อ.{emp[0]?.ap} จ.{emp[0]?.jw}</div>
+                <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF] ml-4 md:ml-10">{emp[0]?.contact}</div>
+              </div>
+              <div id="section2" ref={section2Ref}>
+                  <div className="py-2 md:py-4 lg:py-6">
+                    <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#8E80FF] ml-2 mb-1 md:ml-4 md:mb-2">แผนที่สถานที่ทำงาน</p>
+                    {emp.length > 0 && emp[0].latitude && emp[0].longitude && (
+                    <div className="flex flex-col justify-center w-full mb-2 p-4 bg-[#8E80FF] rounded-3xl" 
+                        style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+                      <MapView
+                        latitude={emp[0].latitude}
+                        longitude={emp[0].longitude}
+                        name=""
+                        h="500px"
+                      />
+                    </div>
+                  )}
+
+                  </div>
+              </div>    
+              
+        </div>
+        )}
+
+        {queryType === "volunteer" && (
+          <div className="bg-white px-5 py-3 md:px-15 md:py-6 lg:px-25 lg:py-12 xl:px-35 xl:py-14">
+          
+              <div className="py-2 md:py-4 lg:py-6">
+                <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#8E80FF] ml-2 mb-1 md:ml-4 md:mb-2">เกี่ยวกับ</p>
+                <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF] ml-4 md:ml-10">
+                  {findvolun[0]?.about_volun && (
+                    <div
+                      className="prose prose-sm md:prose lg:prose-lg"
+                      dangerouslySetInnerHTML={{ __html: findvolun[0].about_volun }}
+                    ></div>
+                  )}
+                </div>
+              </div>
+              <div className="py-2 md:py-4 lg:py-6">
+                <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#8E80FF] ml-2 mb-1 md:ml-4 md:mb-2">วิสัยทัศน์</p>
+                <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF] ml-4 md:ml-10">
+                  
+                  {findvolun[0]?.vission && (
+                    <div
+                      className="prose prose-sm md:prose lg:prose-lg"
+                      dangerouslySetInnerHTML={{ __html: findvolun[0].vission }}
+                    ></div>
+                  )}
+                </div>
+              </div>
+
+              <div className="py-2 md:py-4 lg:py-6">
+                <p className="text-sm font-bold md:text-lg lg:text-2xl xl:text-3xl text-[#8E80FF] ml-2 mb-1 md:ml-4 md:mb-2">พันธกิจ</p>
+                <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF] ml-4 md:ml-10">
+                  {findvolun[0]?.mission && (
+                    <div
+                      className="prose prose-sm md:prose lg:prose-lg"
+                      dangerouslySetInnerHTML={{ __html: findvolun[0].mission }}
+                    ></div>
+                  )}
+                </div>
+              </div>
+              {/* image */}
+              {volun_pic && volun_pic.length > 0 && (
+                <div className="flex justify-center mt-4">
+                  {volun_pic.length === 1 && (
+                    <img
+                      src={`/uploads/${volun_pic}`}
+                      alt="job"
+                      className="w-full max-w-md h-auto rounded-2xl object-cover"
+                    />
+                  )}
+
+                  {(volun_pic.length === 2 || volun_pic.length === 3) && (
+                    <div className={`grid gap-2 grid-cols-${volun_pic.length}`}>
+                      {volun_pic.map((pic, index) => (
+                        <img
+                          key={index}
+                          src={`/uploads/${pic}`}
+                          alt={`job-${index}`}
+                          className="w-full h-48 md:h-56 lg:h-64 xl:h-72 rounded-2xl object-cover"
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {volun_pic.length === 4 && (
+                    <div className="grid grid-cols-2 gap-2">
+                      {volun_pic.map((pic, index) => (
+                        <img
+                          key={index}
+                          src={`/uploads/${pic}`}
+                          alt={`job-${index}`}
+                          className="w-full h-44 md:h-52 lg:h-60 xl:h-64 rounded-2xl object-cover"
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {volun_pic.length >= 5 && (
+                    <div className="flex flex-col lg:flex-row gap-2 w-full max-w-6xl">
+                      <img
+                        src={`/uploads/${volun_pic[0]}`}
+                        alt="main"
+                        className="w-full lg:w-1/2 h-72 md:h-80 xl:h-96 rounded-2xl object-cover"
+                      />
+                      <div className="grid grid-cols-2 gap-2 w-full lg:w-1/2">
+                        {volun_pic.slice(1, 5).map((pic, index) => (
+                          <img
+                            key={index}
+                            src={`/uploads/${pic}`}
+                            alt={`job-sub-${index}`}
+                            className="w-full h-32 md:h-36 lg:h-40 xl:h-44 rounded-2xl object-cover"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              {/* table job */}
+              <div className="flex flex-col bg-[#D9D9D9] rounded-3xl p-5 my-8 md:py-4 lg:py-6" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+                <p className="text-xl text-center md:text-2xl lg:text-3xl font-bold text-[#8E80FF] ml-2 mb-1 md:ml-4 md:mb-2">
+                  กิจกรรมจิตอาสา
+                </p>
+
+                <div className="p-2 lg:p-4 xl:p-6 bg-[#D9D9D9] text-[#8E80FF] text-xs font-bold lg:text-2xl xl:text-3xl">
+                  <table className="w-full border-collapse overflow-hidden rounded-3xl shadow-md">
+                    <thead>
+                      <tr>
+                        <th className="bg-[#8E80FF] text-white text-left p-3 text-xs font-bold lg:text-xl">
+                          ทั้งหมด {volunCount} กิจกรรม
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody className="bg-white">
+                      {volun_post.length === 0 ? (
+                        <tr>
+                          <td className="p-4 text-center text-[#8E80FF] font-bold">ยังไม่มีกิจกรรม</td>
+                        </tr>
+                      ) : (
+                        volun_post.map((post) => (
+                          <tr key={post.post_id} className="border border-t border-[#8E80FF] hover:bg-[#f1f0ff]">
+                            <td className="p-4 text-[#8E80FF] text-xs font-bold lg:text-xl">
+                              <div className="flex justify-between items-center">
+                                <p className="text-xs md:text-xl lg:text-2xl xl:text-3xl font-bold">
+                                  {post.activity_name || 'ชื่อกิจกรรม'}
+                                </p>
+                                <p className="text-[8px] font-bold md:text-sm lg:text-xl xl:text-2xl text-right pt-1">
+                                  วันที่ลงประกาศ {post.post_day ? formatDateToThaiShort(post.post_day) : 'ไม่มีวันที่'}
+                                </p>
+                              </div>
+
+                              <div className="flex items-center justify-center mt-2 md:mt-4 lg:mt-8">
+                                <table>
+                                  <tbody>
+                                    <tr className="lg:h-10 xl:h-12">
+                                      <td className="w-5 md:w-10 lg:w-10 xl:w-15">
+                                        <FaCircle color="#8E80FF" size={12} />
+                                      </td>
+                                      <td className="w-20 md:w-40 lg:w-50 xl:w-60">
+                                        <a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF]">วัน</a>
+                                      </td>
+                                      <td className="w-50 md:w-80 lg:w-90 xl:w-100">
+                                        <a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF]">
+                                          {post.date_start && formatDateToThaiShort(post.date_start)} {post.date_end && '-'+formatDateToThaiShort(post.date_end)} 
+                                        </a>
+                                      </td>
+                                    </tr>
+                                    <tr className="lg:h-10 xl:h-12">
+                                      <td className="w-5 md:w-10 lg:w-10 xl:w-15">
+                                        <FaCircle color="#8E80FF" size={12} />
+                                      </td>
+                                      <td className="w-20 md:w-40 lg:w-50 xl:w-60">
+                                        <a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF]">เวลา</a>
+                                      </td>
+                                      <td className="w-50 md:w-80 lg:w-90 xl:w-100">
+                                        <a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF]">
+                                          {post.time}
+                                        </a>
+                                      </td>
+                                    </tr>
+                                    <tr className="lg:h-10 xl:h-12">
+                                      <td><FaCircle color="#8E80FF" size={12} /></td>
+                                      <td>
+                                        <a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF]">สถานที่</a>
+                                      </td>
+                                      <td>
+                                        <a className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#8E80FF]">
+                                          {post.location} ต.{post.tb} อ.{post.ap} จ.{post.jw}
+                                        </a>
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+
+                              <div className="flex justify-end mt-2">
+                                <button
+                                  onClick={() => goToVolunDetails(post.post_id)}
+                                  className="btn btn-sm lg:btn-lg border border-[#8E80FF] bg-[#8E80FF] text-white rounded-xl"
+                                >
+                                  รายละเอียด
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                  <center>
+                                                        <div className="join items-center gap-2 my-2">
+                                                          {/* ปุ่มย้อนกลับ */}
+                                                          {page > 1 && (
+                                                            <button
+                                                              onClick={() => setPage(page - 1)}
+                                                              className="btn btn-xs bg-[#8E80FF] border-[#8E80FF] rounded-3xl join-item"
+                                                            >
+                                                              «
+                                                            </button>
+                                                          )}
+
+                                                          {/* ปุ่มเลขเพจ */}
+                                                          {Array.from({ length: totalV }, (_, i) => i + 1).map((pageNum) => (
+                                                            <button
+                                                              key={pageNum}
+                                                              onClick={() => setPage(pageNum)}
+                                                              className={`btn btn-xs rounded-3xl join-item 
+                                                                ${page === pageNum ? "bg-[#8E80FF] border-[#8E80FF] text-white" : "bg-white border-[#8E80FF] text-[#8E80FF]"}`}
+                                                            >
+                                                              {pageNum}
+                                                            </button>
+                                                          ))}
+
+                                                          {/* ปุ่มถัดไป */}
+                                                          {page < totalV && (
+                                                            <button
+                                                              onClick={() => setPage(page + 1)}
+                                                              className="btn btn-xs bg-[#8E80FF] border-[#8E80FF] rounded-3xl join-item"
+                                                            >
+                                                              »
+                                                            </button>
+                                                          )}
+                                                        </div>
+                                                      </center>
+                </div>
+              </div>
+
+              <div className="flex flex-col bg-[#D9D9D9] rounded-3xl p-5 mt-7 mb-5 md:py-4 lg:py-6 shadow-md">
+                <p className="text-xl text-center md:text-2xl lg:text-3xl font-bold text-[#8E80FF] mb-4">
+                  รีวิวจากผู้ที่ทำกิจกรรม
+                </p>
+
+                {/* คะแนนรวม */}
+                <div className="flex flex-col items-center justify-center mb-6">
+                  <span className="text-sm md:text-xl text-[#8E80FF] font-bold">คะแนนเฉลี่ย</span>
+                  <EmpRating_volun emp_id={id} cl="#eebf03ff" />
+                </div>
+
+                {/* รายการรีวิวแบบการ์ด */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+                  {volun_review.map((re, index) => (
+                    <div key={index} className="bg-white rounded-2xl shadow-lg p-4 flex flex-col justify-between h-full">
+                      <div className="flex gap-3 items-start">
+                        <img
+                          src={`/uploads/${re.picture || "nophoto.png"}`}
+                          className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover"
+                          alt="user"
+                        />
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <p className="font-bold text-sm md:text-base lg:text-xl text-[#8E80FF]">{re.fullname}</p>
+                            <p className="text-[10px] md:text-sm text-gray-500">{re.date ? formatDateToThaiShort(re.date) : 'ไม่มีวันที่'}</p>
+                          </div>
+                          <p className="text-xs md:text-sm text-gray-600 mt-1">{re.message}</p>
+                        </div>
+                      </div>
+
+                      {/* คะแนนเฉพาะรายการ */}
+                      <div className="flex justify-end mt-4">
+                        <EmpRating_one score={re.score} cl="#8E80FF" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+        </div>
+        )}
+
+        
+
+        <Footer />
+      </div>
+    )
+}
+
+export default ViewEmp_Pf

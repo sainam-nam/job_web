@@ -107,44 +107,44 @@ export default function Dashboard() {
 
         {/* สถิติข้อมูล */}
         <div className="grid grid-cols-4 gap-3 mt-6">
-          <div className="flex flex-col justify-center w-full h-20 md:h-30 lg:h-40 p-2 bg-[#7B6ADA] rounded-xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
-            <p className="text-[10px] lg:text-xs text-white">ผู้สมัครงาน</p>
-            <p className={`${textjobb} md:py-3 lg:py-6 text-white font-bold text-center`} >{jobbCount}</p>
-            <p className="text-[10px] lg:text-xs text-white text-right">ราย</p>
+          <div className="flex flex-col justify-center w-full h-20 md:h-30 lg:h-40 p-6 bg-[#7B6ADA] rounded-xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+            <p className="text-[10px] lg:text-xs xl:text-xl text-white">ผู้สมัครงาน</p>
+            <p className={`${textjobb} md:py-3 text-white font-bold text-center`} >{jobbCount}</p>
+            <p className="text-[10px] lg:text-xs xl:text-xl text-white text-right">ราย</p>
           </div>
-          <div className="flex flex-col justify-center w-full h-20 md:h-30 lg:h-40 p-2 bg-white shadow-xl rounded-xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
-            <p className="text-[10px] lg:text-xs text-[#7B6ADA]">นายจ้าง</p>
-            <p className={`${textemp} md:py-3 lg:py-6 text-[#7B6ADA] font-bold text-center`}>{empCount}</p>
-            <p className="text-[10px] lg:text-xs text-[#7B6ADA] text-right">ราย</p>
+          <div className="flex flex-col justify-center w-full h-20 md:h-30 lg:h-40 p-6 bg-white shadow-xl rounded-xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+            <p className="text-[10px] lg:text-xs xl:text-xl text-[#7B6ADA]">นายจ้าง</p>
+            <p className={`${textemp} md:py-3  text-[#7B6ADA] font-bold text-center`}>{empCount}</p>
+            <p className="text-[10px] lg:text-xs xl:text-xl text-[#7B6ADA] text-right">ราย</p>
           </div>
-          <div className="flex flex-col justify-center w-full h-20 md:h-30 lg:h-40 p-2 bg-[#7B6ADA] shadow-xl rounded-xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
-            <p className="text-[10px] lg:text-xs text-white">งาน</p>
+          <div className="flex flex-col justify-center w-full h-20 md:h-30 lg:h-40 p-6 bg-[#7B6ADA] shadow-xl rounded-xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+            <p className="text-[10px] lg:text-xs xl:text-xl text-white">งาน</p>
             <p className={`${textjob} md:pt-4 md:pb-5 lg:pt-6 lg:pb-7 text-white font-bold text-center`}>{jobCount}</p>
             
           </div>
-          <div className="flex flex-col justify-center w-full h-20 md:h-30 lg:h-40 p-2 bg-white shadow-xl rounded-xl " style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
-            <p className="text-[10px] lg:text-xs text-[#7B6ADA]">ประเภทงาน</p>
-            <p className={`${textjobt} md:py-3 lg:py-6 text-[#7B6ADA] font-bold text-center`}>{jobTypeCount}</p>
-            <p className="text-[10px] lg:text-xs text-[#7B6ADA] text-right">รายการ</p>
+          <div className="flex flex-col justify-center w-full h-20 md:h-30 lg:h-40 p-6 bg-white shadow-xl rounded-xl " style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+            <p className="text-[10px] lg:text-xs xl:text-xl text-[#7B6ADA]">ประเภทงาน</p>
+            <p className={`${textjobt} md:py-3 text-[#7B6ADA] font-bold text-center`}>{jobTypeCount}</p>
+            <p className="text-[10px] lg:text-xs xl:text-xl text-[#7B6ADA] text-right">รายการ</p>
           </div>
         </div>
 
         {/* กราฟ / Chart */}
         <div className="grid grid-cols-2 gap-4 mt-6">
           <div className="p-2 bg-white shadow-md rounded-3xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
-            <div className="pt-2 pb-1 text-[#7B6ADA] font-bold text-sm">ผู้สมัครงาน</div> 
+            <div className="pt-2 pb-1 text-[#7B6ADA] font-bold text-sm xl:text-xl">ผู้สมัครงาน</div> 
             <PieChartComponent gotJob={gotJob} lookingForJob={lookingForJob} />
           </div>
           <div className="pt-2 pb-5 px-2 bg-white shadow-md rounded-3xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
-            <div className="pt-2 pb-1 text-[#7B6ADA] font-bold text-sm">เปรียบเทียบ</div> 
+            <div className="pt-2 pb-1 text-[#7B6ADA] font-bold text-sm xl:text-xl">เปรียบเทียบ</div> 
             <BarChartComponent jobber={jobbCount} emp={empCount} job={jobCount} numjob={numjobCount} />
           </div>
         </div>
         {/* กราฟ / Chart */}
         <div className="grid grid-cols-1 gap-4 mt-6">
           
-          <div className="pt-2 pb-5 px-2 bg-white shadow-md rounded-3xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
-            <div className="pt-2 pb-1 text-[#7B6ADA] font-bold text-sm">ภาพรวม</div> 
+          <div className="pt-2 pb-5 px-4 bg-white shadow-md rounded-3xl" style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+            <div className="pt-2 pb-1 text-[#7B6ADA] font-bold text-sm xl:text-xl">ภาพรวม</div> 
             <BarComponent 
               labels={labels.labels}
               jobs={labels.jobs}

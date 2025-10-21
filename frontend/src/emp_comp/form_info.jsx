@@ -1,0 +1,489 @@
+import React, { useState , useEffect, useRef} from 'react'
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+
+const Emp_InfoForm = () => {
+    const [userId, setUserId] = useState(null);
+    
+    const [formData, setFormData] = useState({
+        firstname: "",
+        lastname: "",
+        // firstname_eng: "",
+        // lastname_eng: "",
+        gender: "",
+        birthday: "",
+        address: "",
+        phone: ""
+    });
+    const navigate = useNavigate();
+    const [jangwatList, setJangwatList] = useState([]);
+    const [ampherList, setAmpherList] = useState([]);
+    const [tambonList, setTambonList] = useState([]);
+
+    const [selectedJangwat, setSelectedJangwat] = useState("");
+    const [selectedAmpher, setSelectedAmpher] = useState("");
+    const [selectedTambon, setSelectedTambon] = useState("");
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+    const [isAmpherLoaded, setIsAmpherLoaded] = useState(false);
+    const [isTambonLoaded, setIsTambonLoaded] = useState(false);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+
+    useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // ถ้าไม่มี token อาจ redirect ไป login
+
+      window.location.href = "/login";
+      return;
+    }
+
+    axios.get(`${apiUrl}/emp_profile`, { //error
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+    //   setUserData(res.data.user);
+      setUserId(res.data.user.emp_id);
+    
+    //   setEmpPercent(res.data.user.percent_match);
+      //console.log(res.data.user);
+    })
+    .catch(err => {
+      console.error(err);
+      // token หมดอายุหรือไม่ถูกต้อง -> กลับหน้า login
+      // alert("เกิดข้อผิดพลาด กรุณาเข้าสู่ระบบอีกครั้ง");
+      window.location.href = "/login";
+    });
+  }, []);
+
+    const profile = async () => {
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${apiUrl}/emp_profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = await res.json();
+
+        if (result.user) {
+        const u = result.user;
+        setFormData({
+            email: u.email || '',
+            firstname: u.fullname?.split(" ")[0] || '',
+            lastname: u.fullname?.split(" ")[1] || '',
+            // firstname_eng: u.fullname_eng?.split(" ")[0] || '',
+            // lastname_eng: u.fullname_eng?.split(" ")[1] || '',
+            gender: u.gender || '',
+            birthday: u.birthday ? formatDateToThaiShort(u.birthday) : '',
+            jw_id: u.jw_id || '',
+            ap_id: u.ap_id || '',
+            tb_id: u.tb_id || '',
+            jw: u.jw || '',
+            ap: u.ap || '',
+            tb: u.tb || '',
+            address: u.address || '',
+            phone: u.phone || '',
+        });
+        } else {
+        console.error("Data format error:", result);
+        setFormData({});
+        }
+    } catch (err) {
+        console.error("Fetch error:", err);
+    }
+    };
+
+    useEffect(() => {
+    if (userId) {
+        profile();
+    }
+    }, [userId]);
+
+
+    
+
+    // โหลดจังหวัดตอนเริ่ม
+    useEffect(() => {
+        axios.get(`${apiUrl}/api/jangwat`).then((res) => {
+            //console.log("จังหวัดที่ได้จาก backend:", res.data);    
+            if (Array.isArray(res.data.data)) {
+                setJangwatList(res.data.data);
+                } else {
+                setJangwatList([]); // fallback
+                }
+        });
+    }, []);
+
+    useEffect(() => {
+        if (formData.jw_id) {
+            axios.get(`${apiUrl}/api/ampher?jangwat_id=${formData.jw_id}`).then((res) => {
+            setAmpherList(res.data.data);
+            setSelectedJangwat(formData.jw_id);
+            setIsAmpherLoaded(true);
+
+        });
+    }
+    }, [formData.jw_id]);
+
+    useEffect(() => {
+        if (isAmpherLoaded && formData.ap_id) {
+            axios.get(`${apiUrl}/api/tambon?ampher_id=${formData.ap_id}`).then((res) => {
+                setTambonList(res.data.data);
+                setSelectedAmpher(formData.ap_id); // 👉 ตั้ง selected อำเภอ
+                setIsTambonLoaded(true);
+            });
+        setIsAmpherLoaded(false); // reset ป้องกัน loop
+    }
+    }, [isAmpherLoaded, formData.ap_id]);
+
+    useEffect(() => {
+    if (isTambonLoaded && formData.tb_id) {
+        setSelectedTambon(formData.tb_id);
+        setIsTambonLoaded(false); // reset เพื่อป้องกัน loop
+    }
+    }, [isTambonLoaded, formData.tb_id]);
+
+
+    // โหลดอำเภอเมื่อเลือกจังหวัด
+    useEffect(() => {
+        if (selectedJangwat) {
+        axios.get(`${apiUrl}/api/ampher?jangwat_id=${selectedJangwat}`).then((res) => {
+            setAmpherList(res.data.data);
+            setTambonList([]); // ล้างตำบลเมื่อจังหวัดเปลี่ยน
+            setSelectedAmpher("");
+            setSelectedTambon("");
+        });
+        }
+    }, [selectedJangwat]);
+
+    // โหลดตำบลเมื่อเลือกอำเภอ
+    useEffect(() => {
+        if (selectedAmpher) {
+        axios.get(`${apiUrl}/api/tambon?ampher_id=${selectedAmpher}`).then((res) => {
+            setTambonList(res.data.data);
+            if (!isInitialLoad) {
+                setSelectedTambon(""); // รีเซตเฉพาะกรณีที่ user เปลี่ยนจริง ๆ
+            }
+        });
+        }
+    }, [selectedAmpher]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const saveModalRef = useRef(null);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+            try {
+                const payload = {
+                ...formData,
+                emp_id: userId,
+                gender: formData.gender === "อื่นๆ" ? formData.gender_detail : formData.gender,
+                tambon_id: selectedTambon || formData.tb_id,
+                };
+
+                //console.log("จะส่งไป backend:", payload);
+
+                // ✅ ตอนนี้ยังไม่มี backend — แต่ถ้ามี จะทำแบบนี้:
+                const res = await axios.post(`${apiUrl}/api/emp_save_profile`, payload);
+                //console.log("ส่งแล้ว:", res.data);
+
+                console.log("ส่งแล้ว:", res.data);
+
+                // ✅ บังคับเปิด modal
+                if (saveModalRef.current) {
+                console.log("เปิด modal save");  // debug
+                saveModalRef.current.showModal();
+                }
+                
+
+            } catch (err) {
+                console.error("ส่งข้อมูลล้มเหลว:", err);
+                //alert("เกิดข้อผิดพลาดในการบันทึก");
+                document.getElementById("cantsave_modal").showModal();
+            }
+    };
+
+    // console.log("ส่งแล้ว:", res.data);
+
+    // // ✅ บังคับเปิด modal
+    // if (saveModalRef.current) {
+    //   console.log("เปิด modal save");  // debug
+    //   saveModalRef.current.showModal();
+    // }
+
+  function formatDateToThaiShort(dateStr) {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // เดือน 0-11 ต้อง +1
+        const year = date.getFullYear(); // เพิ่ม 543 เพื่อเป็นปี พ.ศ.
+
+        return `${year}-${month}-${day}`;
+    }
+
+    useEffect(() => {
+        if (formData.jw_id) setSelectedJangwat(formData.jw_id);
+        if (formData.ap_id) setSelectedAmpher(formData.ap_id);
+        if (formData.tb_id) setSelectedTambon(formData.tb_id);
+        // ✅ หลังโหลดเสร็จแล้วให้ปิด initial load flag
+            const timer = setTimeout(() => {
+                setIsInitialLoad(false);
+            }, 300); // หน่วงเล็กน้อยให้ทุก setState ทำงานก่อน
+
+            return () => clearTimeout(timer);
+    }, [formData]);
+
+
+    
+
+  return (
+    <div>
+        <div className='text-[#8E80FF] bg-white rounded-3xl p-5' style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+            <a className='font-bold text-xl'>ข้อมูลส่วนตัว</a>
+                <form onSubmit={handleSubmit} className='mt-2 '>
+                    <div className="flex flex-col gap-2 items-center justify-center ">
+                        <div className="flex flex-col gap-1 text-sm w-2/3">
+                            <a className="text-[#8E80FF] font-bold">อีเมล : {formData.email}</a>
+                            <div className="flex gap-2">
+                                <div className="flex flex-col w-full">
+                                    <a className="text-[#8E80FF] font-bold">ชื่อ</a>
+                                        <input 
+                                            type="text" 
+                                            className="input w-full bg-white text-[#8E80FF] border-[#A3A3A3] rounded-box" 
+                                             name="firstname"
+                                            value={formData.firstname || ""}
+                                            onChange={handleChange} 
+                                            required/>
+                                </div>
+                                <div className="flex flex-col w-full">
+                                    <a className="text-[#8E80FF] font-bold">นามสกุล</a>
+                                        <input 
+                                        type="text" 
+                                        className="input w-full bg-white text-[#8E80FF] border-[#A3A3A3] rounded-box" 
+                                        name="lastname"
+                                        value={formData.lastname || ""}
+                                        onChange={handleChange} 
+                                         required/>
+                                </div>
+                            </div>
+                            {/* <div className="flex gap-2 mt-2">
+                                <div className="flex flex-col w-full">
+                                    <div className="text-[#8E80FF] font-bold">ชื่อ <a className="text-[10px]">ภาษาอังกฤษ</a></div>
+                                        <input 
+                                            type="text" 
+                                            className="input w-full bg-white text-[#8E80FF] border-[#A3A3A3] rounded-box" 
+                                            name="firstname_eng"
+                                            value={formData.firstname_eng || ""}
+                                            onChange={handleChange} 
+                                            required/>
+                                </div>
+                                <div className="flex flex-col w-full">
+                                    <div className="text-[#8E80FF] font-bold">นามสกุล <a className="text-[10px]">ภาษาอังกฤษ</a></div>
+                                        <input 
+                                            type="text" 
+                                            className="input w-full bg-white text-[#8E80FF] border-[#A3A3A3] rounded-box" 
+                                            name="lastname_eng"
+                                            value={formData.lastname_eng || ""}
+                                            onChange={handleChange} 
+                                            required/>
+                                </div>
+                            </div> */}
+                            <div className="flex justify-between  mt-2">
+                                <a className="text-[#8E80FF] font-bold">เพศ</a>
+                            </div>
+                            <div className='flex justify-between gap-1'>
+                                <div className='flex items-center gap-1'>
+                                    <input 
+                                        type="radio" 
+                                        name="gender" 
+                                        value="M"
+                                        className="radio" 
+                                        checked={formData.gender === "M"} 
+                                        onChange={(e) => setFormData({ ...formData, gender: e.target.value })} />
+                                    ชาย
+                                </div>  
+                                <div className='flex items-center gap-1'>
+                                    <input 
+                                        type="radio" 
+                                        name="gender" 
+                                        value="F"
+                                        className="radio" 
+                                        checked={formData.gender === "F"} 
+                                        onChange={(e) => setFormData({ ...formData, gender: e.target.value })} />
+                                    หญิง
+                                </div> 
+                                <div className='flex items-center gap-1'>
+                                    <input 
+                                    type="radio" 
+                                    name="gender" 
+                                    value="อื่นๆ"
+                                    className="radio" 
+                                    checked={formData.gender !== "M" && formData.gender !== "F"} 
+                                    onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                                     />
+                                    อื่นๆ
+                                    <input
+                                        type="text"
+                                        name="gender"
+                                        placeholder="ระบุหรือไม่ระบุก็ได้"
+                                        className="ml-2 border border-[#A3A3A3] rounded-box px-2 py-1 w-40"
+                                        value={formData.gender !== "M" && formData.gender !== "F" ? formData.gender : ""}
+                                        onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                                    />
+                                </div> 
+                                                    
+                            </div>
+                            {/* <label className="label pt-1">
+                                <input 
+                                    type="checkbox" 
+                                    name="LG" 
+                                    className="checkbox checkbox-sm border-[#8E80FF] checked:text-[#8E80FF]" 
+                                    checked={formData.LG} 
+                                    onChange={(e) => setFormData({ ...formData, LG: e.target.checked })}
+                                />
+                                <a className='text-xs'>ฉันเป็นส่วนหนึ่งของชุมชน LGBTQIA+ (ไม่บังคับเลือก)</a>
+                            </label> */}
+                            <div className="flex justify-between  mt-2">
+                                <a className="text-[#8E80FF] font-bold">วันเกิด</a>
+                            </div>
+                                                
+                            <input 
+                                //type={showCPassword ? "text" : "password"} 
+                                type='date'
+                                className="input w-full bg-white text-[#8E80FF] border border-[#A3A3A3] rounded-box" 
+                                name="birthday"
+                                value={formData.birthday || ""}
+                                //value={form.confirmPassword}
+                                onChange={handleChange}
+                                required
+                            />
+
+                            <div className="flex justify-between pt-2">
+                                <a className="text-[#8E80FF] font-bold">ที่อยู่ปัจจุบัน</a>
+                            </div>
+                            {/* จังหวัด */}
+                                <select
+                                    className="select w-full bg-white border border-[#A3A3A3] text-[#8E80FF] rounded-box"
+                                    value={selectedJangwat}
+                                    onChange={(e) => setSelectedJangwat(e.target.value)}
+                                >
+                                    <option value="">-- กรุณาเลือกจังหวัด --</option>
+                                    {Array.isArray(jangwatList) && jangwatList.map((jangwat) => (
+                                        <option key={jangwat.jangwat_id} value={jangwat.jangwat_id}>
+                                            {jangwat.jangwat_name}
+                                        </option>
+                                        ))}
+                                </select>
+                            <div className="flex gap-2">
+                                <div className="flex flex-col w-full">
+                                    {/* อำเภอ */}
+                                        <select
+                                            className="select w-full bg-white border border-[#A3A3A3] text-[#8E80FF] rounded-box"
+                                            value={selectedAmpher}
+                                            onChange={(e) => setSelectedAmpher(e.target.value)}
+                                            
+                                        >
+                                            <option value="">-- กรุณาเลือกอำเภอ --</option>
+                                            {Array.isArray(ampherList) && ampherList.map((a) => (
+                                            <option key={a.ampher_id} value={a.ampher_id}>
+                                                {a.ampher_name}
+                                            </option>
+                                            ))}
+                                        </select>
+                                </div>
+                                <div className="flex flex-col w-full">
+                                    {/* ตำบล */}
+                                    <select
+                                        className="select w-full bg-white border border-[#A3A3A3] text-[#8E80FF] rounded-box"
+                                        value={selectedTambon}
+                                        onChange={(e) => setSelectedTambon(e.target.value)}
+                                        //disabled={!selectedAmpher}
+                                    >
+                                        <option value="">-- กรุณาเลือกตำบล --</option>
+                                        {Array.isArray(tambonList) && tambonList.map((t) => (
+                                        <option key={t.tambon_id} value={t.tambon_id}>
+                                            {t.tambon_name}
+                                        </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            <input 
+                                //type={showCPassword ? "text" : "password"} 
+                                type='text'
+                                className="input w-full bg-white text-[#8E80FF] border border-[#A3A3A3] rounded-box" 
+                                name="address"
+                                placeholder='ที่อยู่ อาคาร หมู่บ้าน'
+                                value={formData.address || ""}
+                                onChange={handleChange}
+                                required
+                            />
+                            <a className="text-[#8E80FF] font-bold mt-2">เบอร์โทรศัพท์</a>
+                                <input 
+                                    type="text" 
+                                    className="input w-full bg-white text-[#8E80FF] border border-[#A3A3A3] rounded-box" 
+                                    name="phone"
+                                    value={formData.phone || ""}
+                                    onChange={handleChange} 
+                                    required />
+                        </div>
+                        <div className="flex w-full p-4 justify-center">
+                            <hr className="w-1/2 border border-[#D9D9D9]" />
+                        </div> 
+                        <button className="btn bg-[#8E80FF] border-[#8E80FF] rounded-xl mb-2 hover:border-5">บันทึก</button>
+                    </div>
+                </form>
+        </div>
+        {/* Modal เซฟข้อมูล */}
+        <dialog ref={saveModalRef} id="save_modal" className="modal">
+          <div className="modal-box bg-white">
+            <center>
+                <p className="text-4xl  text-[#8E80FF]">บันทึกข้อมูลสำเร็จ</p>
+                <p className=" text-[#8E80FF]">คุณได้บันทึกข้อมูลส่วนตัวเรียบร้อย </p>
+              <div className="w-30 h-30 flex items-center justify-center my-6">
+                <img src="/check.png" className="rounded-full"></img>
+              </div>
+            </center>   
+            <div className="modal-action flex justify-center">
+              
+                <button className="btn bg-[#8E80FF] border border-[#8E80FF] text-white px-4 py-2 rounded-lg" 
+                    onClick={() => {
+                        if (saveModalRef.current) saveModalRef.current.close();
+                        navigate("/emp_profile/info/view");
+                        window.scrollTo(0, 0);
+                    }}>
+                  ตกลง
+                </button>
+              
+            </div>
+          </div>
+        </dialog>
+        {/* Modal เซฟไม่ผ่าน */}
+        <dialog id="cantsave_modal" className="modal">
+          <div className="modal-box bg-white">
+            <center>
+                <p className="text-3xl text-error font-bold">บันทึกข้อมูลไม่สำเร็จ</p>
+                <p className="text-error">โปรดตรวจสอบข้อมูลอีกครั้ง</p>
+              
+              <div className="w-30 h-30 flex items-center justify-center my-6">
+                <img src="/x.png" className="rounded-full"></img>
+              </div>
+            </center> 
+            <div className="modal-action flex justify-center">
+             
+              <button className="btn bg-[#FF0004] border border-error text-white px-4 py-2 rounded-lg" onClick={() => {document.getElementById("cantsave_modal").close();}}>
+                ตกลง
+              </button>
+            </div>
+          </div>
+        </dialog>
+    </div>
+  );
+};
+
+export default Emp_InfoForm;

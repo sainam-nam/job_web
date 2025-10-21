@@ -36,14 +36,14 @@ const PieChartComponent = ({gotJob , lookingForJob}) => {
       <Pie data={data} options={options} />
 
       {/* กล่องคำอธิบายด้านขวาบน */}
-      <div className="absolute top-0 right-0 bg-[#7B6ADA] rounded-xl shadow-md p-2 text-[10px] md:text-xs text-[#D9D9D9] text-center font-bold  "style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+      <div className="absolute top-0 right-0 bg-[#7B6ADA] rounded-xl shadow-md p-4 text-[10px] md:text-sm text-[#D9D9D9] text-center font-bold  "style={{ boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
         {((gotJob / total) * 100).toFixed(0)}% <br />
         ได้งานแล้ว <br />
         {gotJob} ราย
       </div>
 
       {/* กล่องคำอธิบายด้านล่างซ้าย */}
-      <div className="absolute bottom-0 left-0 bg-[#D9D9D9] rounded-xl shadow-md p-2 text-[10px] md:text-xs text-[#7B6ADA] text-center font-bold  "style={{ boxShadow: '0 0 30px rgba(0, 0, 0, 0.2)' }}>
+      <div className="absolute bottom-0 left-0 bg-[#D9D9D9] rounded-xl shadow-md p-4 text-[10px] md:text-sm text-[#7B6ADA] text-center font-bold  "style={{ boxShadow: '0 0 30px rgba(0, 0, 0, 0.2)' }}>
         {((lookingForJob / total) * 100).toFixed(0)}% <br />
         ยังหางานอยู่ <br />
         {lookingForJob} ราย

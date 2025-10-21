@@ -65,6 +65,10 @@ function Emp_Pf() {
   const [volunCount, setVolunCount] = useState([]);
   const [volun_pic, setVolun_pic] = useState([]);
   const [job_pic, setJob_pic] = useState([]);
+  const limit = 5 ;
+   const [page, setPage] = useState(1);
+    const [total, setTotal] = useState();
+    const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
           fetchData();
@@ -79,7 +83,7 @@ function Emp_Pf() {
     try {
       const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-      const res = await fetch(`${apiUrl}/emp_pf?emp_id=${id}`);
+      const res = await fetch(`${apiUrl}/emp_pf?emp_id=${id}&page=${page}&limit=${limit}`);
       const result = await res.json();
 
       if (typeof result === 'object' && 
@@ -200,21 +204,23 @@ function Emp_Pf() {
     return (
       <div>
         {userData && <Navbar user={userData} />}
-        <div className="bg-[#7B6ADA] pl-2 md:pl-4 lg:pl-6 xl:pl-8">
-          <button
-            onClick={handleBack}
-            className="btn btn-xs md:btn-sm lg:btn-lg xl:btn-xl border-white p-2 md:p-3 lg:p-4 xl:p-5  bg-white text-[#7B6ADA] rounded-xl md:rounded-2xl lg:rounded-3xl xl:rounded-4xl"
-          >
-            <HiChevronLeft size={15}/> ย้อนกลับ
-          </button>
-        </div>
+       <div className="relative w-full group">
+              <button
+                onClick={() => navigate(-1)}
+                className="btn btn-xs md:btn-sm lg:btn-lg xl:btn-xl border-white p-2 md:p-3 lg:p-4 xl:p-5  bg-white text-[#8E80FF] rounded-xl md:rounded-2xl lg:rounded-3xl xl:rounded-4xl absolute top-8/11 left-3/5 xl:top-2 xl:left-8"
+              >
+                <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="6">
+                  <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+          </div>
         {/* <center><h1>Job post {id}</h1></center> */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-2  px-7 pb-5 md:px-20 md:pb-7 lg:px-30 lg:pb-14 xl:px-50 xl:pb-10"> 
+        <div className="flex flex-col bg-[#7B6ADA] md:flex-row items-center justify-center gap-2  px-7 pb-5 md:px-20 md:pb-7 lg:px-30 lg:pb-14 xl:px-50 xl:pb-10"> 
           
           <div className="avatar">
             <div className="w-24 sm:w-28 md:w-35 lg:w-55 rounded-full">
               {emp[0]?.picture ? (
-                            <img src={`/uploads/${emp[0]?.picture}`} />
+                            <img src={`/uploads/emp_pic/${emp[0]?.picture}`} />
                           ) : (
                             <img src={`/uploads/nophoto.png`}  />
                           )}
@@ -255,7 +261,7 @@ function Emp_Pf() {
                 </p>
                 <div className="w-full bg-gray-200 rounded-full h-4 md:h-5 lg:h-6 xl:h-8 overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-white to-green-500 h-full rounded-full text-right px-2 py-1 text-[10px] md:text-xs lg:text-base font-bold text-white"
+                    className="bg-gradient-to-r from-green-300 to-green-500 h-full rounded-full text-right px-2 py-1 text-[10px] md:text-xs lg:text-base font-bold text-white"
                     style={{ width: `${emp[0]?.pc_match || 0}%` }}
                   >
                     {emp[0]?.pc_match || 0}%
@@ -468,11 +474,13 @@ function Emp_Pf() {
                 {review.map((re, index) => (
                   <div key={index} className="bg-white rounded-2xl shadow-lg p-4 flex flex-col justify-between h-full">
                     <div className="flex gap-3 items-start">
-                      <img
-                        src={`/uploads/${re.picture || "nophoto.png"}`}
-                        className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover"
-                        alt="user"
-                      />
+                  {re.picture ? (
+                            <img src={`/uploads/user_pic/${re.picture}`} className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover" />
+                          ) : (
+                            <img src={`/uploads/nophoto.png`} className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover" />
+                          )}
+                      
+
                       <div className="flex-1">
                         <div className="flex justify-between items-start">
                           <p className="font-bold text-sm md:text-base lg:text-xl text-[#7B6ADA]">{re.fullname}</p>

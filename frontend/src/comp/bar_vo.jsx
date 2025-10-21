@@ -79,7 +79,7 @@ const BarChartVoComponent = ({ volun , emp , numvolun , volunteer }) => {
       tooltip: { enabled: false },
       datalabels: {
         anchor: 'center',
-        align: 'end',
+        align: 'center',
         offset: -20,
         formatter: (value, context) => {
           const label = context.chart.data.labels[context.dataIndex];
@@ -99,17 +99,24 @@ const BarChartVoComponent = ({ volun , emp , numvolun , volunteer }) => {
       },
     },
     scales: {
-      x: {
-      beginAtZero: true,
-      max: Math.max(percentages),
-      ticks: { display: false },
-      grid: { display: false },
+  x: {
+    beginAtZero: true,
+    max: Math.max(...percentages), // ✅ ใช้ spread เพื่อหา max
+    ticks: { display: false },
+    grid: { 
+      display: true,           // ✅ เปิดการแสดงเส้น
+      color: '#EAEAEA',        // ✅ สีเส้น (จางๆ)
+      lineWidth: 1,            // ✅ ความหนาเส้น
+      drawTicks: false,        // ซ่อนขีด tick
+      drawBorder: false,       // ซ่อนเส้นกรอบ
     },
-    y: {
-      ticks: { display: false },
-      grid: { display: false },
-    },
-    },
+  },
+  y: {
+    ticks: { display: false },
+    grid: { display: false }, // แกน y ไม่ต้องมีเส้น
+  },
+},
+
   };
 
   return (

@@ -78,7 +78,7 @@ const BarChartComponent = ({ jobber , emp , job }) => {
       tooltip: { enabled: false },
       datalabels: {
         anchor: 'center',
-        align: 'end',
+        align: 'center',
         offset: -20,
         formatter: (value, context) => {
           const label = context.chart.data.labels[context.dataIndex];
@@ -99,15 +99,21 @@ const BarChartComponent = ({ jobber , emp , job }) => {
     },
     scales: {
       x: {
-      beginAtZero: true,
-      max: Math.max(percentages),
-      ticks: { display: false },
-      grid: { display: false },
-    },
-    y: {
-      ticks: { display: false },
-      grid: { display: false },
-    },
+        beginAtZero: true,
+        max: Math.max(...percentages),
+        ticks: { display: false },
+        grid: {
+          display: true,
+          color: '#E0DAF4',
+          lineWidth: 1,
+          borderDash: [4, 4],
+          drawTicks: false,
+        },
+      },
+      y: {
+        ticks: { display: false },
+        grid: { display: false },
+      },
     },
   };
 

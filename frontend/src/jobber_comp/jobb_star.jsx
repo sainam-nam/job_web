@@ -41,7 +41,7 @@ const JobbRating = ({ jobber_id , cl }) => {
 
     //   {/* ดาวบน = เติมสีตามเปอร์เซ็นต์ */}
     //   <div
-    //     className="absolute top-0 left-0 flex text-[#7B6ADA] overflow-hidden pointer-events-none"
+    //     className="absolute top-0 left-0 flex text-[#8E80FF] overflow-hidden pointer-events-none"
     //     style={{ width: `50%` }}
     //   >
     //     {[...Array(5)].map((_, i) => <FaStar key={`fg-${i}`} />)}
@@ -56,11 +56,11 @@ const JobbRating = ({ jobber_id , cl }) => {
 
     //         {/* ดาวสีซ้อน */}
     //         <FaStar
-    //           className="absolute text-[#7B6ADA] w-full h-full overflow-hidden"
+    //           className="absolute text-[#8E80FF] w-full h-full overflow-hidden"
     //           style={{
     //             //width: `${fill}%`,
     //             clipPath: 'inset(0 0 0 0)',
-    //             background: `linear-gradient(90deg, #7B6ADA ${fill}%, #d1d5db ${fill}%)`
+    //             background: `linear-gradient(90deg, #8E80FF ${fill}%, #d1d5db ${fill}%)`
     //           }}
     //         />
     //         {/* ดาวว่าง (พื้นหลัง) */}

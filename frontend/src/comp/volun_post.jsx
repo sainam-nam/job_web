@@ -161,19 +161,19 @@ function Volun_Post() {
         {userData && <Navbar user={userData} />}
         <div className="bg-[#7B6ADA] pl-2 md:pl-4 lg:pl-6 xl:pl-8">
           <button
-            onClick={handleBack}
+            onClick={() => navigate(-1)}
             className="btn btn-xs md:btn-sm lg:btn-lg xl:btn-xl border-white p-2 md:p-3 lg:p-4 xl:p-5  bg-white text-[#7B6ADA] rounded-xl md:rounded-2xl lg:rounded-3xl xl:rounded-4xl"
           >
             <HiChevronLeft size={15}/> ย้อนกลับ
           </button>
         </div>
         {/* <center><h1>Job post {id}</h1></center> */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-2  px-7 pb-5 md:px-20 md:pb-7 lg:px-30 lg:pb-14 xl:px-50 xl:pb-10"> 
+        <div className="flex flex-col bg-[#7B6ADA] md:flex-row items-center justify-center gap-2  px-7 pb-5 md:px-20 md:pb-7 lg:px-30 lg:pb-14 xl:px-50 xl:pb-10"> 
           
           <div className="avatar">
             <div className="w-24 sm:w-28 md:w-35 lg:w-55 rounded-full">
               {data[0]?.picture ? (
-                            <img src={`/uploads/${data[0]?.picture}`} />
+                            <img src={`/uploads/emp_pic/${data[0]?.picture}`} />
                           ) : (
                             <img src={`/uploads/nophoto.png`}  />
                           )}
@@ -242,13 +242,24 @@ function Volun_Post() {
           </div>
           <div className="py-2 md:py-4 lg:py-6">
             <p className="text-sm font-bold lg:text-2xl xl:text-3xl text-[#7B6ADA] ml-2 mb-1 md:ml-4 md:mb-2">เกณฑ์การเข้าร่วม</p>
-            <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-4 md:ml-10">อายุ {data[0]?.age}</div>
+            <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-4 md:ml-10">
+              อายุ {
+                (() => {
+                  const age = data[0]?.age || "";
+                  if (age === "0" || age === "0-0") return "ไม่กำหนดอายุ";
+                  const [start, end] = age.split("-").map(Number);
+                  if (start === 0 && end > 0) return `ไม่เกิน ${end} ปี`;
+                  if (end === 0 && start > 0) return `${start} ปีขึ้นไป`;
+                  return age;
+                })()
+              }
+              </div>
             <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-4 md:ml-10">
               เพศ {data[0]?.gender === "M"
                       ? " ชาย"
                       : data[0]?.gender === "F"
                       ? " หญิง"
-                      : data[0]?.gender || "ไม่ระบุ"}
+                      : 'ไม่จำกัดเพศ'|| "ไม่ระบุ"}
             </div>
             <div className="text-[10px] md:text-sm lg:text-xl xl:text-2xl text-[#7B6ADA] ml-4 md:ml-10">
               

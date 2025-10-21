@@ -139,11 +139,16 @@ export default function Jobber() {
               <tr key={index} className="hover:bg-[#D9D9D9] text-[10px] md:text-lg">
                 <td className="text-center">{(page-1) * limit + index +1}</td>
                 <td className="hidden md:table-cell text-center">
-                  {val.picture ? (
-                          <img src={`/uploads/${val.picture}`} className="rounded-full  w-full" />
+                  
+                  <div className="avatar">
+                    <div className="rounded-full">
+                      {val.picture ? (
+                          <img src={`/uploads/user_pic/${val.picture}`} className="rounded-full  w-full object-cover" />
                         ) : (
                           <img src={`/uploads/nophoto.png`} className="rounded-full  w-full" />
                         )}
+                    </div>
+                  </div>
 
                 </td>
                 <td className="">{val.fullname || "N/A"}</td>
@@ -163,7 +168,15 @@ export default function Jobber() {
                     )
                 }
                    
-                <td className="text-center font-bold">{val.j_volun || "N/A"}</td>
+                <td className="text-center font-bold">
+                  {val.j_volun === '/' ? (
+                    <span className="text-green-500">✔️</span>
+                  ) : val.j_volun === '-' ? (
+                    <span className="text-red-500">❌</span>
+                  ) : (
+                    val.j_volun || "N/A"
+                  )}
+                </td>
                 
                 
                 {val.status === "OFF" ? (
@@ -210,7 +223,7 @@ export default function Jobber() {
       <center>
         <div className="join items-center gap-2 my-2">
           {page > 1 && (
-            <button onClick={() => setPage(page - 1)}><img src="/up.png" className="-rotate-90 w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
+            <button onClick={() => setPage(page - 1)}><img src="/up.png" className="-rotate-90 w-4 h-4 md:w-6 md:h-6 " /></button>
           )}
 
         {total > 0 ? (
@@ -221,7 +234,7 @@ export default function Jobber() {
         }
 
           {page < totalPages && (
-            <button onClick={() => setPage(page + 1)}><img src="/down.png" className="-rotate-90 w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
+            <button onClick={() => setPage(page + 1)}><img src="/down.png" className="-rotate-90 w-4 h-4 md:w-6 md:h-6 " /></button>
           )}
         </div>
       </center>

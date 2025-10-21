@@ -189,7 +189,7 @@ export default function Volunteer() {
       <center>
         <div className="join items-center gap-2 my-2">
           {page > 1 && (
-            <button onClick={() => setPage(page - 1)}><img src="/up.png" className="w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
+            <button onClick={() => setPage(page - 1)}><img src="/up.png" className="w-4 h-4 md:w-6 md:h-6 " /></button>
           )}
 
         {total > 0 ? (
@@ -200,7 +200,7 @@ export default function Volunteer() {
         }
 
           {page < totalPages && (
-            <button onClick={() => setPage(page + 1)}><img src="/down.png" className="w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
+            <button onClick={() => setPage(page + 1)}><img src="/down.png" className="w-4 h-4 md:w-6 md:h-6 " /></button>
           )}
         </div>
       </center>

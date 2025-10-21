@@ -27,11 +27,11 @@ const EmpRating_volun = ({ emp_id , cl }) => {
   // };
 
   return (
-    <div className={`flex text-[${cl}] text-xl md:text-3xl lg:text-4xl xl:text-5xl`}>
+    <div className={`flex text-xl lg:text-2xl xl:text-3xl`}  style={{ color: cl }}>
       {[...Array(full)].map((_, i) => <FaStar key={i} />)}
       {half && <FaStarHalfAlt />}
       {[...Array(empty)].map((_, i) => <FaRegStar key={i + full + 1} />)}
-      <div className='text-[8px] md:text-xs'>{stars}</div>
+      <div className='text-[8px] md:text-xl'>{stars}</div>
     </div>
     // <div className="relative w-[120px] h-[24px] text-xl">
     //   {/* ดาวล่าง = ว่าง */}

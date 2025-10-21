@@ -23,11 +23,11 @@ const EmpRating_one = ({ score , cl }) => {
   // };
 
   return (
-    <div className={`flex text-[${cl}] text-xl md:text-3xl lg:text-4xl xl:text-5xl`}>
+    <div className={`flex items-center justify-center text-[${cl}] text-xl lg:text-2xl xl:text-3xl`}>
       {[...Array(full)].map((_, i) => <FaStar key={i} />)}
       {half && <FaStarHalfAlt />}
       {[...Array(empty)].map((_, i) => <FaRegStar key={i + full + 1} />)}
-      <div className='text-[8px] md:text-xs'>{score}</div>
+      <div className='text-[8px] md:text-xs xl:text-xl'>{score}</div>
     </div>
     // <div className="relative w-[120px] h-[24px] text-xl">
     //   {/* ดาวล่าง = ว่าง */}

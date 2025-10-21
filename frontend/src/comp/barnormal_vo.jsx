@@ -7,8 +7,7 @@ import {
   LinearScale,
   BarElement,
   Tooltip,
-  Legend,
-  layouts,
+  Legend
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
@@ -20,7 +19,7 @@ const BarVoComponent = ({ labels = [], volunt = [], interested = [], matched = [
     useEffect(() => {
       const handleResize = () => {
         const width = window.innerWidth;
-        if (width >= 1280) {setFontSize(20);}       
+        if (width >= 1280) {setFontSize(15);}       
         else if (width >= 1024) {setFontSize(12);}  
         else if (width >= 768) {setFontSize(12);}  
         else {setFontSize(8);}    
@@ -41,16 +40,19 @@ const BarVoComponent = ({ labels = [], volunt = [], interested = [], matched = [
       label: 'จำนวนกิจกรรมจิตอาสา',
       data: volunt,
       backgroundColor: '#7B6ADA',
+      borderRadius: 10,
     },
     {
       label: 'จำนวนคนที่สนใจ',
       data: interested,
       backgroundColor: '#9987DF',
+      borderRadius: 10,
     },
     {
-      label: 'จำนวนคนที่คุณสมบัติตรง 50% ขี้นไป',
+      label: 'จำนวนคนที่ลงทะเบียน',
       data: matched,
       backgroundColor: '#E0DAF4',
+      borderRadius: 10,
     },
   ],
   };
@@ -102,19 +104,26 @@ const BarVoComponent = ({ labels = [], volunt = [], interested = [], matched = [
     scales: {
       x: {
         ticks: {
-          display: true,        // ✅ เปิดให้แสดงชื่อ
-          font: {
-            size: fontSize,           // ✅ ขนาดตัวอักษร
-          },
-          color: '#7B6ADA',         // (ถ้าอยากเปลี่ยนสี)
+          display: true,
+          font: { size: fontSize },
+          color: '#7B6ADA',
         },
         grid: {
-          display: false        // ✅ ไม่โชว์เส้นกริดแนวตั้ง
-        }
+          display: false,
+        },
       },
       y: {
-        ticks: { display: false },
-        grid: { display: false },
+        ticks: {
+          display: true,
+          font: { size: fontSize },
+          color: '#EAEAEA',
+          stepSize: 1,
+        },
+        grid: {
+          display: true,
+          color: '#EAEAEA', // ✅ สีเส้นกราฟแนวนอน (จางๆ)
+          lineWidth: 1,
+        },
       },
     },
   };

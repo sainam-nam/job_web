@@ -15,40 +15,34 @@ export default function Navbar({ user }){
                     <img className="w-3 h-3 md:w-5 md:h-5" src="/menu.png"></img>
                   </label>
                 </div>
-                <a className="text-sm md:text-xl font-bold md:ml-3">JOB & VOLUN</a>
+                {/* <a className="text-sm md:text-xl xl:text-2xl font-bold md:ml-3">
+                  JOB & VOLUN
+                </a> */}
+                <Link to="/Admin">
+                  <img
+                  src="/logojv.png"
+                  alt="Logo"
+                  className="w-8 h-8 md:w-12 md:h-12 ml-2 rounded-2xl"
+                  />
+                </Link>
 
               </div>
             </div>
             <div className="flex-1">
-              <ul className="hidden md:menu md:menu-horizontal md:px-1 md:text-xs">
+              <ul className="hidden md:menu md:menu-horizontal md:px-1 md:text-xs xl:text-sm">
                     <li><Link to="/Admin" className="font-bold">หน้าหลัก</Link></li>
               </ul>
                   
             
             </div>
             <div className="flex gap-2">
-              <ul className="menu menu-horizontal px-1 text-xs  justify-center items-center gap-x-0">
+              <ul className="menu menu-horizontal px-1 text-xs xl:text-sm justify-center items-center gap-x-0">
                 <li className="">
                   <div className="">
                         Admin : {user.fullname}
                   </div>
                 </li>
-                <div className="tooltip tooltip-bottom" data-tip="โปรไฟล์">
-                  <li className="">
-                    <div className="avatar">
-                        <div className="w-5 h-5 rounded-full">
-                          <Link to="/profile">
-                          {/* <a>{user.fullname}</a> */}
-                          {user.picture ? (
-                            <img src={`/uploads/${user.picture}`} width={150} />
-                          ) : (
-                            <img src={`/uploads/nophoto.png`} width={150} />
-                          )}
-                          </Link>
-                        </div>
-                    </div>
-                  </li>
-                </div>
+                
                 <div className="tooltip tooltip-bottom" data-tip="ออกจากระบบ">
                   <li className="w-8">
                     <Logout />

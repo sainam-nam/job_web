@@ -35,8 +35,6 @@ function Login() {
       } else if (role === "jobber" || role === "ON") {
         document.getElementById("welcome_modal").showModal();
         
-      } else if (role === "OFF") {
-        alert("บัญชีของคุณถูกระงับ");
       }
     } catch (err) {
       if (err.response) {
@@ -47,6 +45,11 @@ function Login() {
         } else {
           alert("ไม่สามารถเข้าสู่ระบบได้ในขณะนี้");
         }
+      } else if (err.response.status === 403) {
+        const message = err.response.data.message;
+        
+          document.getElementById("suspended_modal").showModal();
+        
       } else {
         alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
       }
@@ -59,53 +62,56 @@ function Login() {
       <main>
         <div className="flex flex-col min-h-screen">
           <Navbar_login />
-          <div className="flex flex-col md:flex-row gap-5 items-center justify-center bg-[#7B6ADA]">
-          <img src="/login.png" className="w-3/4 my-24 sm:w-2/4 md:w-65 md:mx-10 lg:w-130 lg:mr-10" />
+          <div className="flex flex-col md:flex-row gap-5 items-center justify-center bg-[#8E80FF]">
+          <img src="/login2.png" className="w-3/4 my-24 sm:w-2/4 md:w-65 md:mx-10 lg:w-130 lg:mr-10" />
           <button 
             onClick={() => document.getElementById("section2").scrollIntoView({ behavior: "smooth" })} 
             className="btn btn-outline btn-white rounded-box mb-6 md:hidden">คลิกเพื่อเข้าสู่ระบบ</button>
           <div id="section2" className="card bg-white w-96 p-2 sm:w-110 lg:w-160 shadow-md my-40 md:my-40 md:mr-5 lg:my-30 lg:p-5 rounded-4xl">
             
             <div className="flex flex-col items-center py-5 px-2">
-              <a className="card-title items-center text-[#7B6ADA] text-2xl mb-5 lg:text-3xl lg:mb-5">เข้าสู่ระบบ</a>
+              <a className="card-title items-center text-[#8E80FF] text-2xl mb-5 lg:text-3xl lg:mb-5">เข้าสู่ระบบ</a>
                 <div className="relative flex items-center mb-3">
-                  <button onClick={() => navigate("/login")} className="z-10 btn btn-sm bg-[#7B6ADA] border-[#7B6ADA] rounded-full px-5 hover:w-50  lg:text-sm">หางานและทำจิตอาสา</button>
-                  <button onClick={() => navigate("/login_em")} className="z-0 -ml-5 btn btn-sm bg-white text-[#7B6ADA] border-3 px-5 border-[#7B6ADA] rounded-full hover:w-50 lg:text-sm">หาคนและจิตอาสา</button>
+                  <button onClick={() => navigate("/login")} className="z-10 btn btn-sm bg-[#8E80FF] border-[#8E80FF] rounded-full px-5 hover:w-50  lg:text-sm">หางานและทำจิตอาสา</button>
+                  <button onClick={() => navigate("/login_em")} className="z-0 -ml-5 btn btn-sm bg-white text-[#8E80FF] border-3 px-5 border-[#8E80FF] rounded-full hover:w-50 lg:text-sm">หาคนและจิตอาสา</button>
                 </div>
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-col items-center">
                     <div className="flex flex-col">
-                      <a className="text-[#7B6ADA] font-bold">อีเมล</a>
-                      <input type="text" className="input w-75 lg:w-120 bg-white text-[#7B6ADA] border-[#A3A3A3] rounded-box mb-2" 
+                      <a className="text-[#8E80FF] font-bold">อีเมล</a>
+                      <input type="text" className="input w-75 lg:w-120 bg-white text-[#8E80FF] border-[#A3A3A3] rounded-box mb-2" 
                         onChange={e => setEmail(e.target.value)} />
 
                       <div className="flex justify-between">
-                        <a className="text-[#7B6ADA] font-bold">รหัสผ่าน</a>
+                        <a className="text-[#8E80FF] font-bold">รหัสผ่าน</a>
                         
                         
+                        
+                      </div>
+                      <div className="relative w-75 lg:w-120">
+                        <input 
+                          type={showPassword ? "text" : "password"} 
+                          className="input w-full bg-white text-[#8E80FF] border-[#A3A3A3] rounded-box pr-10" 
+                          onChange={e => setPassword(e.target.value)}
+                        />
                         <div 
-                          className="text-gray-500"
+                          className="absolute inset-y-0 right-3 flex items-center text-gray-500 cursor-pointer"
                           onClick={() => setShowPassword(!showPassword)}
                         >
-                          {showPassword ? <FaRegEyeSlash /> : <FaRegEye /> }
+                          {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
                         </div>
                       </div>
-                      
-                      <input 
-                        type={showPassword ? "text" : "password"} 
-                        className="input w-75 lg:w-120 bg-white text-[#7B6ADA] border-[#A3A3A3] rounded-box" 
-                        onChange={e => setPassword(e.target.value)}
-                      />
+
 
                       <div className="flex flex-row-reverse">
-                        <a className="text-[#A3A3A3] underline hover:text-[#7B6ADA]" onClick={() => navigate("/forget-password")}>ลืมรหัสผ่าน</a>
+                        <a className="text-[#A3A3A3] underline hover:text-[#8E80FF]" onClick={() => navigate("/forget-password")}>ลืมรหัสผ่าน</a>
                       </div>
 
                     </div>
-                    <button className="btn bg-[#7B6ADA] border-[#7B6ADA] rounded-xl my-2 hover:border-5">เข้าสู่ระบบ</button>
+                    <button className="btn bg-[#8E80FF] border-[#8E80FF] rounded-xl my-2 hover:border-5">เข้าสู่ระบบ</button>
                   </div>
                 </form>
-                <a className="text-[#A3A3A3] underline hover:text-[#7B6ADA]" onClick={() => navigate("/register")}>ยังไม่ได้ลงทะเบียน?</a>
+                <a className="text-[#A3A3A3] underline hover:text-[#8E80FF]" onClick={() => navigate("/register")}>ยังไม่ได้ลงทะเบียน?</a>
               
               
             </div>
@@ -118,8 +124,8 @@ function Login() {
         <dialog id="welcome_modal" className="modal">
           <div className="modal-box bg-white">
             <center>
-                <p className="text-4xl text-[#7B6ADA]">ยินดีต้อนรับ</p>
-                <p className="text-[#7B6ADA]">เว็บไซต์จัดหางานและจิตอาสาภายในชุมชน</p>
+                <p className="text-4xl text-[#8E80FF]">ยินดีต้อนรับ</p>
+                <p className="text-[#8E80FF]">เว็บไซต์จัดหางานและจิตอาสาภายในชุมชน</p>
               
               <div className="w-30 h-30 flex items-center justify-center my-6">
                 <img src="/check.png" className="rounded-full"></img>
@@ -127,7 +133,7 @@ function Login() {
             </center> 
             <div className="modal-action flex justify-center">
              
-              <button className="btn bg-[#7B6ADA] border border-[#7B6ADA] text-white px-4 py-2 rounded-lg" onClick={() => {navigate("/User/alljob"); window.scrollTo(0, 0);}}>
+              <button className="btn bg-[#8E80FF] border border-[#8E80FF] text-white px-4 py-2 rounded-lg" onClick={() => {navigate("/User/alljob"); window.scrollTo(0, 0);}}>
                 ตกลง
               </button>
             </div>
@@ -138,15 +144,15 @@ function Login() {
         <dialog id="welcome_admin_modal" className="modal">
           <div className="modal-box bg-white">
             <center>
-                <p className="text-4xl  text-[#7B6ADA]">ยินดีต้อนรับ ADMIN</p>
-                <p className=" text-[#7B6ADA]">เว็บไซต์จัดหางานและจิตอาสาภายในชุมชน</p>
+                <p className="text-4xl  text-[#8E80FF]">ยินดีต้อนรับ ADMIN</p>
+                <p className=" text-[#8E80FF]">เว็บไซต์จัดหางานและจิตอาสาภายในชุมชน</p>
               <div className="w-30 h-30 flex items-center justify-center my-6">
                 <img src="/check.png" className="rounded-full"></img>
               </div>
             </center>   
             <div className="modal-action flex justify-center">
               
-                <button className="btn bg-[#7B6ADA] border border-[#7B6ADA] text-white px-4 py-2 rounded-lg" onClick={() => {navigate("/Admin"); window.scrollTo(0, 0);}}>
+                <button className="btn bg-[#8E80FF] border border-[#8E80FF] text-white px-4 py-2 rounded-lg" onClick={() => {navigate("/Admin"); window.scrollTo(0, 0);}}>
                   ตกลง
                 </button>
               
@@ -172,6 +178,31 @@ function Login() {
             </div>
           </div>
         </dialog>
+        {/* Modal บัญชีถูกระงับ */}
+        <dialog id="suspended_modal" className="modal">
+          <div className="modal-box bg-white">
+            <center>
+              <p className="text-2xl text-error font-bold">บัญชีของคุณถูกระงับ</p>
+              <p className="text-error mt-2">โปรดติดต่อแอดมินที่</p>
+              <p className="text-error">jobvolun.service@gmail.com</p>
+
+              <div className="w-30 h-30 flex items-center justify-center my-6">
+                <img src="/x.png" className="rounded-full" />
+              </div>
+            </center>
+            <div className="modal-action flex justify-center">
+              <button
+                className="btn bg-[#FF0004] border border-error text-white px-4 py-2 rounded-lg"
+                onClick={() => {
+                  document.getElementById("suspended_modal").close();
+                }}
+              >
+                ตกลง
+              </button>
+            </div>
+          </div>
+        </dialog>
+
       </main>
     )
 }

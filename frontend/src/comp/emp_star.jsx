@@ -33,7 +33,7 @@ const EmpRating = ({ emp_id , cl }) => {
       {[...Array(full)].map((_, i) => <FaStar key={i} />)}
       {half && <FaStarHalfAlt />}
       {[...Array(empty)].map((_, i) => <FaRegStar key={i + full + 1} />)}
-      <div className='text-[8px] md:text-xs'>{stars}</div>
+      {stars}
     </div>
     // <div className="relative w-[120px] h-[24px] text-xl">
     //   {/* ดาวล่าง = ว่าง */}

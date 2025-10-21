@@ -1,15 +1,21 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar_regis(){
   const navigate = useNavigate();
     return(
-        <div className="navbar bg-[#7B6ADA] shadow-md" >
+        <div className="navbar bg-[#8E80FF] shadow-md" >
         <div className="flex-1">
-          <a onClick={() => navigate("/")} className="text-white font-bold text-md">JOB & VOLUN</a>
+          <Link to="/" className="inline-block">
+                  <img
+                  src="/logo jv.png"
+                  alt="Logo"
+                  className="w-8 h-8 md:w-25 md:h-25 ml-2 object-cover rounded-xl"
+                  />
+                </Link>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => navigate("/login")} className="btn btn-xs md:btn-sm bg-[#7B6ADA] border-white rounded-box">เข้าสู่ระบบ</button>
-          <button onClick={() => navigate("/Register")} className="btn btn-xs md:btn-sm text-[#7B6ADA] bg-white border-white rounded-box">ลงทะเบียน</button>
+          <button onClick={() => navigate("/login")} className="btn btn-xs md:btn-sm xl:btn-md bg-[#8E80FF] border-white rounded-box">เข้าสู่ระบบ</button>
+          <button onClick={() => navigate("/Register")} className="btn btn-xs md:btn-sm xl:btn-md text-[#8E79F8] bg-white border-white rounded-box">ลงทะเบียน</button>
         </div>
       </div>
     )

@@ -5,13 +5,14 @@ const EmpRating = ({ emp_id , cl }) => {
   const [stars, setStars] = useState(0);
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
+  // console.log(cl);
   useEffect(() => {
     //console.log('emp_id:', cl);
     //if (!emp_id) return;
     fetch(`${apiUrl}/emp_rating?emp_id=${emp_id}`)
       .then(res => res.json())
       .then(data => setStars(data.stars || 0));
-  }, [emp_id , cl]);
+  }, [emp_id]);
 
   const full = Math.floor(stars);
   const half = stars % 1 >= 0.5;
@@ -27,12 +28,19 @@ const EmpRating = ({ emp_id , cl }) => {
   // };
 
   return (
-    <div className={`flex text-[${cl}] text-md md:text-lg lg:text-sm`}>
-      {[...Array(full)].map((_, i) => <FaStar key={i} />)}
-      {half && <FaStarHalfAlt />}
-      {[...Array(empty)].map((_, i) => <FaRegStar key={i + full + 1} />)}
-      <div className='text-[8px] md:text-xs'>{stars}</div>
-    </div>
+    stars !== 0 && (
+      <div className='flex flex-col'>
+        <div className='text-gray-500 text-lg'>คะแนนรีวิว {stars}</div>
+        <div className={`flex text-md md:text-lg lg:text-3xl xl:text-5xl`} style={{ color: cl }}>
+          
+
+          {[...Array(full)].map((_, i) => <FaStar key={i} />)}
+          {half ? <FaStarHalfAlt key="half" /> : null}
+          {[...Array(empty)].map((_, i) => <FaRegStar key={i + full + 1} />)}
+          
+        </div>
+      </div>
+    )
     // <div className="relative w-[120px] h-[24px] text-xl">
     //   {/* ดาวล่าง = ว่าง */}
     //   <div className="absolute top-0 left-0 flex text-gray-300 pointer-events-none">

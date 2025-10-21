@@ -153,19 +153,19 @@ function Job_Post() {
         {userData && <Navbar user={userData} />}
         <div className="bg-[#7B6ADA] pl-2 md:pl-4 lg:pl-6 xl:pl-8">
           <button
-            onClick={handleBack}
+            onClick={() => navigate(-1)}
             className="btn btn-xs md:btn-sm lg:btn-lg xl:btn-xl border-white p-2 md:p-3 lg:p-4 xl:p-5  bg-white text-[#7B6ADA] rounded-xl md:rounded-2xl lg:rounded-3xl xl:rounded-4xl"
           >
             <HiChevronLeft size={15}/> ย้อนกลับ
           </button>
         </div>
         {/* <center><h1>Job post {id}</h1></center> */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-2  px-7 pb-5 md:px-20 md:pb-7 lg:px-30 lg:pb-14 xl:px-50 xl:pb-10"> 
+        <div className="flex flex-col md:flex-row items-center bg-[#7B6ADA] justify-center gap-2  px-7 pb-5 md:px-20 md:pb-7 lg:px-30 lg:pb-14 xl:px-50 xl:pb-10"> 
           
           <div className="avatar">
             <div className="w-24 sm:w-28 md:w-35 lg:w-55 rounded-full">
               {data[0]?.picture ? (
-                            <img src={`/uploads/${data[0]?.picture}`} />
+                            <img src={`/uploads/emp_pic/${data[0]?.picture}`} />
                           ) : (
                             <img src={`/uploads/nophoto.png`}  />
                           )}
@@ -260,7 +260,7 @@ function Job_Post() {
                   <a>ทักษะด้านความรู้ที่ควรมี</a>
                    {hs.map((hs , index) =>(
 
-                    <p className="ml-4">{index+1}.{hs.hardskill_name} </p>
+                    <p key={index} className="ml-4">{index+1}.{hs.hardskill_name} </p>
                     
                    ))}
                 </div>
@@ -275,7 +275,7 @@ function Job_Post() {
                   <a>ทักษะด้านความรู้ที่ควรมี</a>
                    {ss.map((ss , index) =>(
 
-                    <p className="ml-4">{index+1}.{ss.softskill_name} </p>
+                    <p key={index} className="ml-4">{index+1}.{ss.softskill_name} </p>
                     
                    ))}
                 </div>

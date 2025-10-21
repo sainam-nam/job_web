@@ -1,9 +1,13 @@
+import TermsModal from '../jobber_comp/TermsModel';
 import { MapView } from './map_view';
 import { Link ,useLocation } from "react-router-dom";
+import { useState , useEffect } from "react";
 
 export default function Footer(){
     const name = "CRRU";
     const location = useLocation();
+    
+        const [showModal, setShowModal] = useState(false);
 
     const isActive = (path) => location.pathname.startsWith(path);
 
@@ -20,7 +24,7 @@ export default function Footer(){
       { label: "ทักษะด้านอารมณ์", to: "/Admin/SS" },
     ];
     return(
-        <div className='p-3'>
+        <div className=' bg-[#7B6ADA] p-3'>
             <footer className="footer footer-horizontal footer-center  md:footer md:footer-vertical bg-[#7B6ADA] text-base-content py-5">
                 <nav className='hidden md:w-6/7 md:block'>
                     <h6 className="footer-title">ระบบจัดหางานและจิตอาสาภายในชุมชน</h6>
@@ -63,7 +67,6 @@ export default function Footer(){
                                 </Link>
                                 
                             ))}
-                            <a className="link link-hover">เงื่อนไขและความเป็นส่วนตัว</a>
                         </div>
                 </nav>
                 

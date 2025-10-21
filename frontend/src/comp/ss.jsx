@@ -199,7 +199,7 @@ export default function SS() {
       <center>
         <div className="join items-center gap-2 my-2">
         {page > 1 && (
-            <button disabled={page === 1} onClick={() => setPage(page - 1)}><img src="/up.png" className="-rotate-90 w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
+            <button disabled={page === 1} onClick={() => setPage(page - 1)}><img src="/up.png" className="-rotate-90 w-4 h-4 md:w-6 md:h-6 " /></button>
         )}
         {total > 0 ? (
           <button className="btn btn-xs btn-primary rounded-3xl join-item btn">{page}/{totalPages}</button>
@@ -209,7 +209,7 @@ export default function SS() {
         }  
           
         {page < totalPages && (
-          <button disabled={page === totalPages} onClick={() => setPage(page + 1)}><img src="/down.png" className="-rotate-90 w-4 h-4 md:w-6 md:h-6 hover:shadow-lg hover:shadow-[#7B6ADA] transition-shadow" /></button>
+          <button disabled={page === totalPages} onClick={() => setPage(page + 1)}><img src="/down.png" className="-rotate-90 w-4 h-4 md:w-6 md:h-6 " /></button>
         )}
         </div>
       </center>
