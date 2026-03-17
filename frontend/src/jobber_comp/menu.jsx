@@ -41,11 +41,7 @@ export default function Menu({ onFilterChange , onJVTypeChange }) {
       //   year2: false,
       //   year3: false,
       // });
-      const [gender, setGender] = useState({
-        male: false,
-        female: false,
-        all: false,
-      });
+      const [gender, setGender] = useState("");
       const [is_lgbtq , setIsLGBTQ] = useState("2");
 
       const asideRef = useRef(null);
@@ -62,12 +58,16 @@ export default function Menu({ onFilterChange , onJVTypeChange }) {
                   Sun: false
               });
 
+      const refreshAllDays = () => {
+            setWeekdays({
+                Mon: false, Tue: false, Wed: false, Thu: false, Fri: false, Sat: false, Sun: false
+            });
+        };
       const selectAllDays = () => {
             setWeekdays({
                 Mon: true, Tue: true, Wed: true, Thu: true, Fri: true, Sat: true, Sun: true
             });
         };
-
         const selectWeekdaysOnly = () => {
             setWeekdays({
                 Mon: true, Tue: true, Wed: true, Thu: true, Fri: true, Sat: false, Sun: false
@@ -78,6 +78,13 @@ export default function Menu({ onFilterChange , onJVTypeChange }) {
             setWeekdays({
                 Mon: false, Tue: false, Wed: false, Thu: false, Fri: false, Sat: true, Sun: true
             });
+        };
+
+
+        const handleGenderChange = (value) => {
+          setGender((prev) => (prev === value ? "" : value)); 
+          // ถ้าค่าที่คลิก = ค่าปัจจุบัน → ยกเลิกเลือก
+          // ถ้าไม่ตรง → เปลี่ยนเป็นค่าที่คลิก
         };
 
       useEffect(() => {
@@ -349,6 +356,7 @@ export default function Menu({ onFilterChange , onJVTypeChange }) {
                                         </option>
                                         ))}
                                 </select>
+                                <span className="text-xs text-gray-100">เลือกประเภทของงานก่อน</span>
                   </div>
                   <div className="flex flex-col gap-2">
                     <a>การจ้างงาน</a>
@@ -483,62 +491,67 @@ export default function Menu({ onFilterChange , onJVTypeChange }) {
                                     </select>
                   </div>
                   <div className="flex flex-col">
-                    <a>ประสบการณ์</a>
+                    <a>จำนวนปีประสบการณ์</a>
                     <input
                       type="number"
                       min="0"
-                      placeholder="ระบุจำนวนปีประสบการณ์"
+                      
                       className="input bg-white border-white w-full text-[#8E80FF] text-sm rounded-xl px-3 py-2"
                       value={selectedExper}
                       onChange={(e) => setSelectedExper(e.target.value)}
                     />
-                    
+                    <span className="text-xs text-gray-100">ระบุจำนวนปีประสบการณ์ เช่น 1 หรือ 2</span>
                   </div>
                   <div className="flex flex-col">
                     <label className="mb-1">อายุ</label>
                     <input
                       type="number"
                       min="0"
-                      placeholder="ระบุอายุ เช่น 18"
                       className="input bg-white border-white w-full text-[#8E80FF] text-sm rounded-xl px-3 py-2"
                       value={selectedAge}
                       onChange={(e) => setSelectedAge(e.target.value)}
                     />
+                    <span className="text-xs text-gray-100">ระบุอายุที่สามารถทำงานนั้นๆได้ เช่น 18 หรือ 20</span>
                   </div>
                   <div className="flex flex-col">
                     <a>เพศ</a>
                     <div className="flex justify-center items-center gap-3">
-                    <label className="label text-white">
-                        <input 
-                          type="checkbox"  
-                          className="checkbox checkbox-lg text-white border-[#D9D9D9] checked:text-white" 
-                          checked={gender.male}
-                          onChange={(e) =>
-                            setGender({ ...gender, male: e.target.checked })
-                          }
-                        />ชาย
-                      </label>
-                    <label className="label text-white">
-                        <input 
-                          type="checkbox"  
-                          className="checkbox checkbox-lg border-[#D9D9D9] checked:text-white" 
-                          checked={gender.female}
-                          onChange={(e) =>
-                            setGender({ ...gender, female: e.target.checked })
-                          }
-                        />หญิง
-                      </label>
-                      <label className="label text-white">
-                        <input 
-                          type="checkbox"  
-                          className="checkbox checkbox-lg border-[#D9D9D9] checked:text-white" 
-                          checked={gender.all}
-                          onChange={(e) =>
-                            setGender({ ...gender, all: e.target.checked })
-                          }
-                        />ไม่จำกัด
-                      </label>
-                    </div>
+  <label className="label text-white flex items-center gap-1">
+    <input
+      type="radio"
+      name="gender"
+      value="male"
+      checked={gender === "male"}
+      onChange={() => handleGenderChange("male")}
+      className="radio radio-lg border-[#D9D9D9] checked:bg-[#8E80FF]"
+    />
+    ชาย
+  </label>
+
+  <label className="label text-white flex items-center gap-1">
+    <input
+      type="radio"
+      name="gender"
+      value="female"
+      checked={gender === "female"}
+      onChange={() => handleGenderChange("female")}
+      className="radio radio-lg border-[#D9D9D9] checked:bg-[#8E80FF]"
+    />
+    หญิง
+  </label>
+
+  <label className="label text-white flex items-center gap-1">
+    <input
+      type="radio"
+      name="gender"
+      value="all"
+      checked={gender === "all"}
+      onChange={() => handleGenderChange("all")}
+      className="radio radio-lg border-[#D9D9D9] checked:bg-[#8E80FF]"
+    />
+    ไม่จำกัด
+  </label>
+</div>
                   </div>
                   {/* <div className="flex flex-col">
                     <a>LGBTQIA+</a>
@@ -555,7 +568,18 @@ export default function Menu({ onFilterChange , onJVTypeChange }) {
                   </div> */}
                   
                   <div className="flex flex-col">
-                    <a>วันทำงาน</a>
+                    <div className="flex gap-1">
+                      <a>วันทำงาน</a>
+                       <button
+                          onClick={refreshAllDays}
+                          className="flex items-center p-1 gap-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 justify-center"
+                        >
+                          <FiRefreshCw className="w-4 h-4" strokeWidth={4} />
+                          
+                        </button>
+                    </div>
+                    
+                    
                     <div className='flex gap-2 my-2'>      
                                 <div className="flex gap-3 flex-wrap">
                                     <button type="button" onClick={selectAllDays} className="btn btn-sm btn-outline rounded-xl">ทุกวัน</button>
